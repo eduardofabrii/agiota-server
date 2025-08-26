@@ -12,7 +12,6 @@ import com.agiota.bank.repository.UserRepository;
 
 import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
 
