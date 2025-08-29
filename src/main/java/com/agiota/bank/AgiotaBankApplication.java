@@ -29,8 +29,15 @@ public class AgiotaBankApplication implements CommandLineRunner {
         user1.setPassword("1234");
         user1.setRole(UserRole.ADMIN);
 
+        User user2 = new User();
+        user2.setName("Joao Silva");
+        user2.setEmail("joaosilva@gmail.com");
+        user2.setPassword("senha5678");
+        user2.setRole(UserRole.USER);
+
         List<User> usuarios = Arrays.asList(
-                user1
+                user1,
+                user2
         );
 
         userRepository.saveAll(usuarios);
