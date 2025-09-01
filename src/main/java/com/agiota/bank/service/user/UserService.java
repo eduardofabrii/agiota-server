@@ -8,4 +8,5 @@ import com.agiota.bank.dto.response.UserResponseDTO;
 public interface UserService {
     List<UserResponseDTO> listAll();
     UserResponseDTO create(UserRequestDTO postRequest);
+    void updateLastLogin(String name);
 }
