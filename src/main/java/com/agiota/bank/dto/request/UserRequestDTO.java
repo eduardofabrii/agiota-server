@@ -1,6 +1,5 @@
 package com.agiota.bank.dto.request;
 
-
 import com.agiota.bank.model.user.UserRole;
 
 import jakarta.validation.constraints.Email;

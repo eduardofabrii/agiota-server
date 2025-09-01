@@ -23,16 +23,12 @@ public class AgiotaBankApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        User user1 = new User();
-        user1.setName("Eduardo Fabri");
-        user1.setEmail("eduardohfabri@gmail.com");
-        user1.setPassword("1234");
-        user1.setRole(UserRole.ADMIN);
+        if (userRepository.count() == 0) {
+            User user1 = new User("Eduardo Fabri", "eduardohfabri@gmail.com", "1234", UserRole.ADMIN);
+            User user2 = new User("Joao Silva", "joaosilva@gmail.com", "senha5678", UserRole.USER);
 
-        List<User> usuarios = Arrays.asList(
-                user1
-        );
-
-        userRepository.saveAll(usuarios);
+            List<User> usuarios = Arrays.asList(user1, user2);
+            userRepository.saveAll(usuarios);
+        }
     }
 }

@@ -14,9 +14,10 @@ import com.agiota.bank.model.user.User;
 public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "active", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "lastLogin", ignore = true)
+    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "authorities", ignore = true)
     User toUserPostRequest(UserRequestDTO userRequest);
 
     UserResponseDTO toUserPostResponse(User user);
