@@ -35,10 +35,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponseDTO update(Long id, UserRequestDTO dto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        userRepository.save(user);
+        return mapper.toUserPostResponse(user);
+    }
+
+    @Override
+    public UserResponseDTO listUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return mapper.toUserPostResponse(user);
+    }
+
+    public void delete(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setDeletedAt(LocalDateTime.now());
+        user.setActive(false);
+        userRepository.save(user);
+    }
+
+    @Override
     public void updateLastLogin(String name) {
         User user = userRepository.findByUsername(name)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
     }
