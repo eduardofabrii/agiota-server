@@ -57,6 +57,18 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    public void restore(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (user.getDeletedAt() != null) {
+            user.setDeletedAt(null);
+            user.setActive(true);
+            userRepository.save(user);
+        } else {
+            throw new IllegalStateException("User is not deleted");
+        }
+    }
+
     @Override
     public void delete(Long id) {
         if (!userRepository.existsById(id)) {

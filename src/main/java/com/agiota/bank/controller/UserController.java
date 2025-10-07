@@ -55,6 +55,13 @@ public class UserController {
         return ResponseEntity.ok("User soft deleted successfully");
     }
 
+    @PutMapping("restore/{id}")
+    public ResponseEntity<String> restore(
+            @PathVariable Long id) {
+        userService.restore(id);
+        return ResponseEntity.ok("User restored successfully");
+    }
+
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(
             @PathVariable Long id

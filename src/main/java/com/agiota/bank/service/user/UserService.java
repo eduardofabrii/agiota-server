@@ -12,5 +12,6 @@ public interface UserService {
     UserResponseDTO update(Long id, UserRequestDTO dto);
     void delete(Long id);
     void softDelete(Long id);
+    void restore(Long id);
     void updateLastLogin(String name);
 }
