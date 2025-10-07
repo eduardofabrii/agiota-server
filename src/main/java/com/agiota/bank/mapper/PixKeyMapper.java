@@ -17,7 +17,7 @@ public interface PixKeyMapper {
 
     PixKey toPixKeyPostRequest(PixKeyRequestDTO userRequest, Long ownerId);
 
-    PixKeyResponseDTO toPixKeyResponse(PixKey pixKey);
+    PixKeyResponseDTO toPixKeyPostResponse(PixKey pixKey);
 
-    List<PixKeyResponseDTO> toPixKeyResponseDTOList(List<PixKey> pixKeys);
+    List<PixKeyResponseDTO> toPixKeyListResponse(List<PixKey> pixKeys);
 }
