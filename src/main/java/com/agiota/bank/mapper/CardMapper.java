@@ -1,25 +1,22 @@
 package com.agiota.bank.mapper;
 
-import com.agiota.bank.model.cards.Cards;
+import java.util.List;
+
+import com.agiota.bank.model.cards.Card;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
+
 import com.agiota.bank.dto.request.CardRequestDTO;
 import com.agiota.bank.dto.response.CardResponseDTO;
 
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CardMapper {
-    public static Cards toEntity(CardRequestDTO dto) {
-        Cards card = new Cards();
-        card.setNumber(dto.getNumber());
-        card.setHolderName(dto.getHolderName());
-        card.setExpirationDate(dto.getExpirationDate());
-        card.setCvv(dto.getCvv());
-        return card;
-    }
 
-    public static CardResponseDTO toResponseDTO(Cards card) {
-        CardResponseDTO dto = new CardResponseDTO();
-        dto.setId(card.getId());
-        dto.setNumber(card.getNumber());
-        dto.setHolderName(card.getHolderName());
-        dto.setExpirationDate(card.getExpirationDate());
-        return dto;
-    }
+    @Mapping(target = "id", ignore = true)
+    Card toCardPostRequest(CardRequestDTO cardRequest);
+
+    CardResponseDTO toCardPostResponse(Card card);
+
+    List<CardResponseDTO> toCardListResponse(List<Card> cards);
 }

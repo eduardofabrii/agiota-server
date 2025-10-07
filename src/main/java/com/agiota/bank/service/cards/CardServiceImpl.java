@@ -4,53 +4,49 @@ import com.agiota.bank.dto.request.CardRequestDTO;
 import com.agiota.bank.dto.response.CardResponseDTO;
 import com.agiota.bank.exception.ResourceNotFoundException;
 import com.agiota.bank.mapper.CardMapper;
-import com.agiota.bank.model.cards.Cards;
+import com.agiota.bank.model.cards.Card;
 import com.agiota.bank.repository.CardRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CardServiceImpl implements CardService {
 
     private final CardRepository cardRepository;
-
-    public CardServiceImpl(CardRepository cardRepository) {
-        this.cardRepository = cardRepository;
-    }
+    private final CardMapper cardMapper;
 
     @Override
     public CardResponseDTO create(CardRequestDTO dto) {
-        Cards card = CardMapper.toEntity(dto);
+        Card card = cardMapper.toCardPostRequest(dto);
         card = cardRepository.save(card);
-        return CardMapper.toResponseDTO(card);
+        return cardMapper.toCardPostResponse(card);
     }
 
     @Override
     public CardResponseDTO getById(Long id) {
-        Cards card = cardRepository.findById(id)
+        Card card = cardRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
-        return CardMapper.toResponseDTO(card);
+        return cardMapper.toCardPostResponse(card);
     }
 
     @Override
     public List<CardResponseDTO> getAll() {
-        return cardRepository.findAll().stream()
-                .map(CardMapper::toResponseDTO)
-                .collect(Collectors.toList());
+        return cardMapper.toCardListResponse(cardRepository.findAll());
     }
 
     @Override
     public CardResponseDTO update(Long id, CardRequestDTO dto) {
-        Cards card = cardRepository.findById(id)
+        Card card = cardRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
-        card.setNumber(dto.getNumber());
-        card.setHolderName(dto.getHolderName());
-        card.setExpirationDate(dto.getExpirationDate());
-        card.setCvv(dto.getCvv());
+        card.setNumber(dto.number());
+        card.setHolderName(dto.holderName());
+        card.setExpirationDate(dto.expirationDate());
+        card.setCvv(dto.cvv());
         card = cardRepository.save(card);
-        return CardMapper.toResponseDTO(card);
+        return cardMapper.toCardPostResponse(card);
     }
 
     @Override
