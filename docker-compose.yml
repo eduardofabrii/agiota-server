@@ -30,6 +30,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://db-mysql:3306/agiotabank?createDatabaseIfNotExist=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: senhadoagiotabank
+    volumes:
+      - ./src:/app/src
+      - ./target:/app/target
     networks:
       - default
 

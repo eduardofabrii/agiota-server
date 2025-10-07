@@ -26,9 +26,47 @@ public class UserController {
         return ResponseEntity.ok(userService.listAll());
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<UserResponseDTO> listUserById(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(userService.listUserById(id));
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(
+            @Valid @RequestBody UserRequestDTO dto,
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(userService.update(id, dto));
+    }
+
     @PostMapping
-    public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserRequestDTO postRequest) throws URISyntaxException {
+    public ResponseEntity<UserResponseDTO> create(
+            @Valid @RequestBody UserRequestDTO postRequest
+    ) throws URISyntaxException {
         UserResponseDTO response = userService.create(postRequest);
         return ResponseEntity.created(new URI("/v1/user/" + response.id())).body(response);
+    }
+
+    @DeleteMapping("deactivate/{id}")
+    public ResponseEntity<String> softDelete(@PathVariable Long id) {
+        userService.softDelete(id);
+        return ResponseEntity.ok("User soft deleted successfully");
+    }
+
+    @PutMapping("restore/{id}")
+    public ResponseEntity<String> restore(
+            @PathVariable Long id) {
+        userService.restore(id);
+        return ResponseEntity.ok("User restored successfully");
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id
+    ) {
+        userService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
