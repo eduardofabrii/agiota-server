@@ -37,24 +37,24 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                    .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/user").permitAll()
 
-                    // Configuração do Swagger
-                    .requestMatchers(
-                        "/swagger-ui.html",
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**",
-                        "/swagger-resources/**",
-                        "/swagger-resources"
-                    ).permitAll()
+                        // Configuração do Swagger
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/swagger-resources"
+                        ).permitAll()
 
-                    // Rotas protegidas acessíveis apenas por admin
-                    .requestMatchers(HttpMethod.POST, "/v1/**").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.DELETE, "/v1/**").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.PUT, "/v1/**").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.GET, "/v1/**").permitAll()
-                    
-                    .anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.POST, "/v1/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/v1/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/v1/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/v1/**").hasRole("USER")
+
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                     .authenticationEntryPoint(authenticationEntryPoint())  // Erros de autenticação (ex: 401)
