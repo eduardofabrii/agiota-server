@@ -49,12 +49,20 @@ public class UserServiceImpl implements UserService {
         return mapper.toUserPostResponse(user);
     }
 
-    public void delete(Long id) {
+    public void softDelete(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setDeletedAt(LocalDateTime.now());
         user.setActive(false);
         userRepository.save(user);
+    }
+
+    @Override
+    public void delete(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User not found");
+        }
+        userRepository.deleteById(id);
     }
 
     @Override

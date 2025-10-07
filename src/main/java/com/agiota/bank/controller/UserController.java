@@ -49,9 +49,17 @@ public class UserController {
         return ResponseEntity.created(new URI("/v1/user/" + response.id())).body(response);
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
-        userService.delete(id);
+    @DeleteMapping("deactivate/{id}")
+    public ResponseEntity<String> softDelete(@PathVariable Long id) {
+        userService.softDelete(id);
         return ResponseEntity.ok("User soft deleted successfully");
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id
+    ) {
+        userService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

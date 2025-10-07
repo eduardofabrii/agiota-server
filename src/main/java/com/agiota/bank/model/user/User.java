@@ -43,7 +43,7 @@ public class User implements UserDetails {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(updatable = false, nullable = true)
+    @Column(nullable = true)
     private LocalDateTime deletedAt;
 
     private LocalDateTime lastLogin;
