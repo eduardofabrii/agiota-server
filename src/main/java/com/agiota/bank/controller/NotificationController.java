@@ -1,6 +1,7 @@
 package com.agiota.bank.controller;
 
-import com.agiota.bank.model.notification.Notification;
+import com.agiota.bank.dto.request.NotificationRequestDTO;
+import com.agiota.bank.dto.response.NotificationResponseDTO;
 import com.agiota.bank.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +19,17 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
+    @PostMapping
+    public ResponseEntity<NotificationResponseDTO> createNotification(@RequestBody NotificationRequestDTO notificationRequest) {
+        NotificationResponseDTO createdNotification = notificationService.createAndSendNotification(notificationRequest);
+        return ResponseEntity.status(201).body(createdNotification);
+    }
+
     @GetMapping
-    public ResponseEntity<List<Notification>> getUserNotifications(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<List<NotificationResponseDTO>> getUserNotifications(@AuthenticationPrincipal UserDetails userDetails) {
         // O @AuthenticationPrincipal injeta o usuário logado
         User currentUser = (User) userDetails;
-        List<Notification> notifications = notificationService.getNotificationsForUser(currentUser.getId());
+        List<NotificationResponseDTO> notifications = notificationService.getNotificationsForUser(currentUser.getId());
         return ResponseEntity.ok(notifications);
     }
 
