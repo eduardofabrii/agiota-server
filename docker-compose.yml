@@ -1,7 +1,7 @@
 services:
   db-mysql:
     image: mysql:8.0
-    container_name: meu-banco-mysql
+    container_name: agiota-mysql
     restart: always
     environment:
       MYSQL_DATABASE: agiotabank
