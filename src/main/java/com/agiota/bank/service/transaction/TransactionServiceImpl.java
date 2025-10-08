@@ -36,7 +36,7 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionResponseDTO create(TransactionRequestDTO postRequest, Long originUserId) {
         String pixKey = postRequest.destinationPixKey();
         PixKey pixKeyEntity = pixKeyRepository.findByKeyValue(pixKey).orElseThrow(() -> new ResourceNotFoundException("PixKey not found"));
-        Long destinationUserId = pixKeyEntity.getOwner().getId();
+        Long destinationUserId = pixKeyEntity.getAccount().getId();
         Transaction transaction = transactionMapper.toTransactionPostRequest(postRequest, originUserId, destinationUserId);
         Transaction savedTransaction = transactionRepository.save(transaction);
         return transactionMapper.toTransactionPostResponse(savedTransaction);

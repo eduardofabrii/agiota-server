@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PixKeyRepository extends JpaRepository<PixKey, String> {
-    List<PixKey> findByOwnerId(Long ownerId);
+    List<PixKey> findByAccountId(Long accountId);
     Optional<PixKey> findByKeyValue(String keyValue);
 }

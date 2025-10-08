@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record PixKeyRequestDTO(
         @NotBlank @NotNull String keyValue,
-        @NotNull PixKeyTypes keyType
+        @NotNull PixKeyTypes type
 ) {
 
 }

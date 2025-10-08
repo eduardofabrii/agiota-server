@@ -15,11 +15,11 @@ import java.util.List;
 public class PixKeyController {
     private PixKeyService pixKeyService;
 
-    @PostMapping("/{ownerId}")
+    @PostMapping("/{accountId}")
     public ResponseEntity<PixKeyResponseDTO> createPixKey(
             @RequestBody PixKeyRequestDTO dto,
-            @PathVariable Long ownerId) {
-        PixKeyResponseDTO response = pixKeyService.createPixKey(dto, ownerId);
+            @PathVariable Long accountId) {
+        PixKeyResponseDTO response = pixKeyService.createPixKey(dto, accountId);
         return ResponseEntity.ok(response);
     }
 
@@ -29,9 +29,9 @@ public class PixKeyController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<List<PixKeyResponseDTO>> listPixKeyByOwnerId(@PathVariable Long ownerId) {
-        List<PixKeyResponseDTO> response = pixKeyService.listPixKeyByOwnerId(ownerId);
+    @GetMapping("/account/{accountId}")
+    public ResponseEntity<List<PixKeyResponseDTO>> listPixKeyByAccountId(@PathVariable Long accountId) {
+        List<PixKeyResponseDTO> response = pixKeyService.listPixKeyByAccountId(accountId);
         return ResponseEntity.ok(response);
     }
 
