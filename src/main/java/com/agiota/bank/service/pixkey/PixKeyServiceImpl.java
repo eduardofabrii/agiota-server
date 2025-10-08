@@ -2,6 +2,7 @@ package com.agiota.bank.service.pixkey;
 
 import com.agiota.bank.dto.request.PixKeyRequestDTO;
 import com.agiota.bank.dto.response.PixKeyResponseDTO;
+import com.agiota.bank.exception.ResourceAlreadyExistsException;
 import com.agiota.bank.exception.ResourceNotFoundException;
 import com.agiota.bank.mapper.PixKeyMapper;
 import com.agiota.bank.model.pixkey.PixKey;
@@ -18,8 +19,11 @@ public class PixKeyServiceImpl implements PixKeyService {
     private final PixKeyMapper mapper;
 
     @Override
-    public PixKeyResponseDTO createPixKey(PixKeyRequestDTO dto, Long ownerId) {
-        PixKey pixKey = mapper.toPixKeyPostRequest(dto, ownerId);
+    public PixKeyResponseDTO createPixKey(PixKeyRequestDTO dto, Long accountId) {
+        if (pixKeyRepository.existsById(dto.keyValue())) {
+            throw new ResourceAlreadyExistsException("Pix key '" + dto.keyValue() + "' already exists.");
+        }
+        PixKey pixKey = mapper.toPixKeyPostRequest(dto, accountId);
         pixKeyRepository.save(pixKey);
         return mapper.toPixKeyPostResponse(pixKey);
     }
@@ -32,17 +36,9 @@ public class PixKeyServiceImpl implements PixKeyService {
     }
 
     @Override
-    public List<PixKeyResponseDTO> listPixKeyByOwnerId(Long ownerId) {
-        List<PixKey> pixKeys = pixKeyRepository.findByOwnerId(ownerId);
+    public List<PixKeyResponseDTO> listPixKeyByAccountId(Long accountId) {
+        List<PixKey> pixKeys = pixKeyRepository.findByAccountId(accountId);
         return mapper.toPixKeyListResponse(pixKeys);
-    }
-
-    @Override
-    public PixKeyResponseDTO updatePixKey(String keyValue, PixKeyRequestDTO dto) {
-        PixKey pixKey = pixKeyRepository.findByKeyValue(keyValue)
-                .orElseThrow(() -> new ResourceNotFoundException("PixKey not found"));
-        pixKeyRepository.save(pixKey);
-        return mapper.toPixKeyPostResponse(pixKey);
     }
 
     @Override

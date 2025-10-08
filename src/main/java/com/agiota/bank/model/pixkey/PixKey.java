@@ -1,5 +1,6 @@
 package com.agiota.bank.model.pixkey;
 
+import com.agiota.bank.model.account.Account;
 import com.agiota.bank.model.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,9 +18,10 @@ public class PixKey {
     private String keyValue;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PixKeyTypes type;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false, updatable = false)
-    private User owner;
+    @JoinColumn(name = "account_id", nullable = false, updatable = false)
+    private Account account;
 }

@@ -12,9 +12,12 @@ import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface PixKeyMapper {
-    PixKey toPixKeyPostRequest(PixKeyRequestDTO userRequest, Long ownerId);
+    @Mapping(target = "account.id", source = "accountId")
+    PixKey toPixKeyPostRequest(PixKeyRequestDTO userRequest, Long accountId);
 
+    @Mapping(target = "accountId", source = "account.id")
     PixKeyResponseDTO toPixKeyPostResponse(PixKey pixKey);
 
+    @Mapping(target = "accountId", source = "account.id")
     List<PixKeyResponseDTO> toPixKeyListResponse(List<PixKey> pixKeys);
 }
