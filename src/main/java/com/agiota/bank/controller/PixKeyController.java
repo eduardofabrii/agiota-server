@@ -35,14 +35,6 @@ public class PixKeyController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{keyValue}")
-    public ResponseEntity<PixKeyResponseDTO> updatePixKey(
-            @PathVariable String keyValue,
-            @RequestBody PixKeyRequestDTO dto) {
-        PixKeyResponseDTO response = pixKeyService.updatePixKey(keyValue, dto);
-        return ResponseEntity.ok(response);
-    }
-
     @DeleteMapping("/{keyValue}")
     public ResponseEntity<Void> deletePixKey(@PathVariable String keyValue) {
         pixKeyService.deletePixKey(keyValue);

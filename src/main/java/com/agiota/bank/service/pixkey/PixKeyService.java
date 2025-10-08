@@ -6,8 +6,11 @@ import com.agiota.bank.dto.response.PixKeyResponseDTO;
 import java.util.List;
 
 public interface PixKeyService {
-    public PixKeyResponseDTO createPixKey(PixKeyRequestDTO dto, Long accountId);
-    public PixKeyResponseDTO getPixKey(String keyValue);
-    public List<PixKeyResponseDTO> listPixKeyByAccountId(Long accountId);
-    public void deletePixKey(String keyValue);
+    PixKeyResponseDTO createPixKey(PixKeyRequestDTO dto, Long accountId);
+
+    PixKeyResponseDTO getPixKey(String keyValue);
+
+    List<PixKeyResponseDTO> listPixKeyByAccountId(Long accountId);
+
+    void deletePixKey(String keyValue);
 }
