@@ -23,7 +23,7 @@ public class NotificationService {
     private final JavaMailSender mailSender;
 
     public NotificationResponseDTO createAndSendNotification(NotificationRequestDTO requestDTO) {
-        User recipient = userRepository.findById(requestDTO.getRecipientId())
+        User recipient = userRepository.findById(requestDTO.getUser_id())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         
         Notification notification = new Notification(recipient, requestDTO.getMessage());
