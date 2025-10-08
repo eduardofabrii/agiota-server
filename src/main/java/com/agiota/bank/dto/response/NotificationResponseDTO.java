@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class NotificationResponseDTO {
     private Long id;
-    private Long recipientId;
-    private String recipientName;
+    private Long user_id;
+    private String userName;
     private String message;
     private LocalDateTime createdAt;
     private boolean isRead;
