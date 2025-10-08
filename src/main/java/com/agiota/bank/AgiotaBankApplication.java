@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.agiota.bank.service.notification.NotificationService;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -20,24 +21,27 @@ import java.util.List;
 public class AgiotaBankApplication implements CommandLineRunner {
 
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
     private final AccountRepository accountRepository;
+
 
     public static void main(String[] args) {
         SpringApplication.run(AgiotaBankApplication.class, args);
     }
 
-    @Override
     public void run(String... args) {
-        System.out.println(">>> Banco de dados vazio. Criando registros de teste... <<<");
-
         User user1 = new User("Eduardo Fabri", "eduardohfabri@gmail.com", "123456", UserRole.ADMIN);
         User user2 = new User("Joao Silva", "joaosilva@gmail.com", "123456", UserRole.USER);
         userRepository.saveAll(Arrays.asList(user1, user2));
 
         List<Account> contas = getAccounts(user1, user2);
         accountRepository.saveAll(contas);
-
-        System.out.println(">>> Usuários e contas de teste criados com sucesso! <<<");
+  
+        userRepository.findById(1L).ifPresent(user -> {
+                  String subject = "Alerta de Segurança: Transação Suspeita Detectada";
+                  String message = "Olá, " + user.getName() + ". Detectamos uma transação incomum de R$ 7.850,00 em sua conta. Se você não a reconhece, por favor, entre em contato conosco imediatamente.";
+                  notificationService.createAndSendNotification(user, subject, message);
+              });
     }
 
     private static List<Account> getAccounts(User user1, User user2) {
