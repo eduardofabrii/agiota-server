@@ -12,9 +12,6 @@ import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface PixKeyMapper {
-
-    @Mapping(target = "id", ignore = true)
-
     PixKey toPixKeyPostRequest(PixKeyRequestDTO userRequest, Long ownerId);
 
     PixKeyResponseDTO toPixKeyPostResponse(PixKey pixKey);
