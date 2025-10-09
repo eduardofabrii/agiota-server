@@ -21,15 +21,15 @@ public class TransactionController {
     }
     @GetMapping("/sent/{id}")
     public ResponseEntity<List<TransactionResponseDTO>> listUserTransactionsSent(@PathVariable Long id) {
-        return ResponseEntity.ok(transactionService.listUserTransactionsSent(id));
+        return ResponseEntity.ok(transactionService.listAccountTransactionsSent(id));
     }
     @GetMapping("/received/{id}")
     public ResponseEntity<List<TransactionResponseDTO>> listUserTransactionsReceived(@PathVariable Long id) {
-        return ResponseEntity.ok(transactionService.listUserTransactionsReceived(id));
+        return ResponseEntity.ok(transactionService.listAccountTransactionsReceived(id));
     }
-    @PostMapping("/{originUserId}")
-    public ResponseEntity<TransactionResponseDTO> create(@RequestBody TransactionRequestDTO dto, @PathVariable Long originUserId) {
-        return ResponseEntity.ok(transactionService.create(dto,originUserId));
+    @PostMapping("/{originAccountId}")
+    public ResponseEntity<TransactionResponseDTO> create(@RequestBody TransactionRequestDTO dto, @PathVariable Long originAccountId) {
+        return ResponseEntity.ok(transactionService.create(dto,originAccountId));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

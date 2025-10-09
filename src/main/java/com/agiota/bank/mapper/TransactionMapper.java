@@ -13,7 +13,17 @@ import java.util.List;
 public interface TransactionMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "date", ignore = true)
+    @Mapping(target = "originAccount.id", source = "originUserId")
+    @Mapping(target = "destinationAccount.id", source = "destinationUserId")
     Transaction toTransactionPostRequest(TransactionRequestDTO dto, Long originUserId, Long destinationUserId);
+    @Mapping(target = "originAgency", source = "originAccount.agency")
+    @Mapping(target = "originAccountNumber", source = "originAccount.accountNumber")
+    @Mapping(target = "destinationAgency", source = "destinationAccount.agency")
+    @Mapping(target = "destinationAccountNumber", source = "destinationAccount.accountNumber")
     TransactionResponseDTO toTransactionPostResponse(Transaction transaction);
+    @Mapping(target = "originAgency", source = "originAccount.agency")
+    @Mapping(target = "originAccountNumber", source = "originAccount.accountNumber")
+    @Mapping(target = "destinationAgency", source = "destinationAccount.agency")
+    @Mapping(target = "destinationAccountNumber", source = "destinationAccount.accountNumber")
     List<TransactionResponseDTO> toTransactionListResponse(List<Transaction> transactions);
 }
