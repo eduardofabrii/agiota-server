@@ -31,11 +31,11 @@ public class Transaction {
     @Column(nullable = false)
     private String status = "Success";
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "origin_account_id", nullable = false)
     private Account originAccount;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "destination_account_id", nullable = false)
     private Account destinationAccount;
 }
