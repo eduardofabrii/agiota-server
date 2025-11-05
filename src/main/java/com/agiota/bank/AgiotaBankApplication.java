@@ -2,9 +2,12 @@ package com.agiota.bank;
 
 import com.agiota.bank.model.account.Account;
 import com.agiota.bank.model.account.AccountType;
+import com.agiota.bank.model.pixkey.PixKey;
+import com.agiota.bank.model.pixkey.PixKeyTypes;
 import com.agiota.bank.model.user.User;
 import com.agiota.bank.model.user.UserRole;
 import com.agiota.bank.repository.AccountRepository;
+import com.agiota.bank.repository.PixKeyRepository;
 import com.agiota.bank.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -23,8 +26,7 @@ public class AgiotaBankApplication implements CommandLineRunner {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final AccountRepository accountRepository;
-
-
+    private final PixKeyRepository pixKeyRepository;
     public static void main(String[] args) {
         SpringApplication.run(AgiotaBankApplication.class, args);
     }
@@ -36,7 +38,10 @@ public class AgiotaBankApplication implements CommandLineRunner {
 
         List<Account> contas = getAccounts(user1, user2);
         accountRepository.saveAll(contas);
-  
+        PixKey pixKey1 = new PixKey("11111111111", PixKeyTypes.CPF ,contas.get(0));
+        PixKey pixKey2 = new PixKey("41 99999-9999", PixKeyTypes.TELEFONE, contas.get(1));
+        pixKeyRepository.saveAll(Arrays.asList(pixKey1, pixKey2));
+
         userRepository.findById(1L).ifPresent(user -> {
                   String subject = "Alerta de Segurança: Transação Suspeita Detectada";
                   String message = "Olá, " + user.getName() + ". Detectamos uma transação incomum de R$ 7.850,00 em sua conta. Se você não a reconhece, por favor, entre em contato conosco imediatamente.";

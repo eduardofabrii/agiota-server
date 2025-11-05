@@ -10,10 +10,9 @@ import java.math.BigDecimal;
 public record TransactionRequestDTO(
         @NotNull @Positive BigDecimal value,
         String destinationPixKey,
-        String destinationBank,
         String destinationAgency,
-        String destinationAccount,
-        @NotNull TransactionType transactionType
+        String destinationAccountNumber,
+        @NotNull TransactionType type
 ) {
 
 }

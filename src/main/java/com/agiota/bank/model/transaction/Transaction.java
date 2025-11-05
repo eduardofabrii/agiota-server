@@ -1,6 +1,6 @@
 package com.agiota.bank.model.transaction;
 
-import com.agiota.bank.model.user.User;
+import com.agiota.bank.model.account.Account;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,11 +28,14 @@ public class Transaction {
     @Column(nullable = false)
     private TransactionType type;
 
-    @ManyToOne
-    @JoinColumn(name = "origin_user_id", nullable = false)
-    private User originUser;
+    @Column(nullable = false)
+    private String status = "Success";
 
     @ManyToOne
-    @JoinColumn(name = "destination_user_id", nullable = false)
-    private User destinationUser;
+    @JoinColumn(name = "origin_account_id", nullable = false)
+    private Account originAccount;
+
+    @ManyToOne
+    @JoinColumn(name = "destination_account_id", nullable = false)
+    private Account destinationAccount;
 }

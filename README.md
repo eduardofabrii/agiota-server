@@ -27,28 +27,120 @@ A aplicação utiliza **Spring MVC**, **Spring Data JPA**, **Spring Security** c
 - **Spring Security**
 - **Spring Boot Mail Sender**
 - **MySQL** (banco de dados principal)
-- **Docker & Docker Compose**
 - **Lombok**
 - **MapStruct**
 - **Maven**
 
 ---
 
-# 🚀 Como Rodar o Projeto
-
-Existem duas maneiras de executar a aplicação: utilizando Docker (recomendado) ou configurando o ambiente localmente.
-
-## Opção 1: Rodando com Docker (Recomendado)
-
-Este método é o mais simples, pois configura e conecta o banco de dados e a API automaticamente.
+## 🚀 Como Rodar o Projeto
 
 ### Pré-requisitos
 - [Git](https://git-scm.com)
-- [Docker](https://www.docker.com/get-started)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+- [JDK 17+](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
+- [Maven](https://maven.apache.org/download.cgi) (ou use o wrapper `mvnw` incluído no projeto)
+- [MySQL 8.0+](https://dev.mysql.com/downloads/mysql/)
 
 ### Passos
-1.  **Clone o repositório:**
+
+1. **Clone o repositório:**
+```bash
+git clone https://github.com/seu-usuario/agiota-server.git
+cd agiota-server
+```
+
+2. **Configure o MySQL:**
+   - Instale o MySQL na sua máquina (se ainda não tiver)
+   - Inicie o serviço MySQL
+   - Crie o banco de dados (opcional, pois a aplicação cria automaticamente):
+   ```sql
+   CREATE DATABASE agiotabank;
+   ```
+
+3. **Configure as credenciais do banco:**
+   - Abra o arquivo `src/main/resources/application.properties`
+   - Altere a senha do MySQL se necessário (padrão: `senhadoagiotabank`):
+   ```properties
+   spring.datasource.password=SUA_SENHA_AQUI
+   ```
+
+4. **Compile o projeto:**
+```bash
+./mvnw clean install
+```
+   Ou no Windows:
+```cmd
+mvnw.cmd clean install
+```
+
+5. **Execute a aplicação:**
+```bash
+./mvnw spring-boot:run
+```
+   Ou no Windows:
+```cmd
+mvnw.cmd spring-boot:run
+```
+
+6. **Acesse a API:**
+   - API: `http://localhost:8080`
+   - Swagger UI: `http://localhost:8080/swagger-ui.html`
+
+---
+
+## 📚 Documentação da API
+
+A documentação completa da API está disponível através do Swagger UI quando a aplicação estiver rodando:
+
+```
+http://localhost:8080/swagger-ui.html
+```
+
+---
+
+## 🔐 Autenticação
+
+A API utiliza JWT para autenticação. Para acessar endpoints protegidos:
+
+1. Faça login através do endpoint `/auth/login`
+2. Use o token JWT retornado no header `Authorization: Bearer {token}`
+
+---
+
+## 📝 Configurações Importantes
+
+### Banco de Dados
+- **URL**: `jdbc:mysql://localhost:3306/agiotabank`
+- **Usuário padrão**: `root`
+- **Senha padrão**: `senhadoagiotabank`
+
+### JPA/Hibernate
+- **DDL Auto**: `update` (cria e atualiza tabelas automaticamente)
+- **Show SQL**: `true` (mostra queries SQL no console)
+
+### Segurança
+- **Token Secret**: Configurado em `application.properties`
+
+---
+
+## 🛠️ Desenvolvimento
+
+### Rodando em modo de desenvolvimento
+```bash
+./mvnw spring-boot:run
+```
+
+### Compilando para produção
+```bash
+./mvnw clean package -DskipTests
+java -jar target/agiota-server-*.jar
+```
+
+---
+
+## 📧 Contato
+
+Para dúvidas ou sugestões, entre em contato através do e-mail: agiotabankk@gmail.com
     ```bash
     git clone [https://github.com/eduardofabrii/agiota-server.git](https://github.com/eduardofabrii/agiota-server.git)
     cd agiota-server

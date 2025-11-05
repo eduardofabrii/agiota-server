@@ -7,11 +7,11 @@ import java.math.BigDecimal;
 public record TransactionResponseDTO(
         Long id,
         BigDecimal value,
-        String destinationPixKey,
-        String destinationBank,
+        String originAgency,
+        String originAccountNumber,
         String destinationAgency,
-        String destinationAccount,
-        TransactionType transactionType,
+        String destinationAccountNumber,
+        TransactionType type,
         String status
 ) {
 }

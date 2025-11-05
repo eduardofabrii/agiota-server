@@ -1,5 +1,6 @@
 package com.agiota.bank.model.account;
 
+import com.agiota.bank.model.transaction.Transaction;
 import com.agiota.bank.model.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -46,6 +48,12 @@ public class Account {
 
     @Column(nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @OneToMany(mappedBy = "originAccount", cascade = CascadeType.ALL)
+    private List<Transaction> transactions;
+
+    @OneToMany(mappedBy = "destinationAccount", cascade = CascadeType.ALL)
+    private List<Transaction> transactionsReceived;
 
     public Account(User user, String agency, String accountNumber, AccountType accountType, BigDecimal initialBalance) {
         this.user = user;
