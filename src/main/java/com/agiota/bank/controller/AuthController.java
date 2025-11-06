@@ -9,6 +9,8 @@ import com.agiota.bank.infra.token.TokenConfig;
 import com.agiota.bank.model.user.User;
 import com.agiota.bank.service.user.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -18,10 +20,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
 @RestController
-@RequestMapping("auth")
+@RequestMapping("/v1/auth")
 @RequiredArgsConstructor
+@Tag(name = "Autenticação", description = "Operações relacionadas à autenticação")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -29,7 +31,8 @@ public class AuthController {
     private final TokenConfig tokenConfig;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid AuthenticationRequestDTO dto) {
+    @Operation(summary = "Fazer login no sistema")
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationRequestDTO dto) {
         var userPassword = new UsernamePasswordAuthenticationToken(dto.name(), dto.password());
         var auth = this.authenticationManager.authenticate(userPassword);
 
