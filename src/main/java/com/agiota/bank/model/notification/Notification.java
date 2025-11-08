@@ -28,6 +28,10 @@ public class Notification {
     @Column(nullable = false)
     private String message;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private NotificationType type;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -37,11 +41,17 @@ public class Notification {
      * Construtor customizado para facilitar a criação de novas notificações
      * sem a necessidade de passar todos os campos.
      */
-    public Notification(User recipient, String message) {
+    public Notification(User recipient, String message, NotificationType type) {
         this.recipient = recipient;
         this.message = message;
+        this.type = type;
         this.isRead = false; 
         this.createdAt = LocalDateTime.now();
+    }
+
+ 
+    public Notification(User recipient, String message) {
+        this(recipient, message, NotificationType.SYSTEM_MAINTENANCE);
     }
 
     @PrePersist

@@ -8,6 +8,7 @@ import com.agiota.bank.model.account.Account;
 import com.agiota.bank.model.user.User;
 import com.agiota.bank.repository.AccountRepository;
 import com.agiota.bank.repository.UserRepository;
+import com.agiota.bank.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final AccountMapper accountMapper;
+    private final NotificationService notificationService;
 
     @Override
     public AccountResponseDTO create(AccountRequestDTO requestDTO) {
@@ -35,6 +37,8 @@ public class AccountServiceImpl implements AccountService {
         account.setAccountNumber(generateAccountNumber());
 
         Account savedAccount = accountRepository.save(account);
+
+        notificationService.notifyAccountCreated(user, savedAccount.getAccountNumber(), savedAccount.getAgency());
 
         return accountMapper.toAccountResponse(savedAccount);
     }
@@ -60,6 +64,10 @@ public class AccountServiceImpl implements AccountService {
         updateAccountFields(account, requestDTO);
 
         Account updatedAccount = accountRepository.save(account);
+        
+
+        notificationService.notifyAccountUpdated(account.getUser(), updatedAccount.getAccountNumber());
+        
         return accountMapper.toAccountResponse(updatedAccount);
     }
 
@@ -68,6 +76,8 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found with id: " + id));
 
+        notificationService.notifyAccountDeleted(account.getUser(), account.getAccountNumber());
+        
         accountRepository.delete(account);
     }
 

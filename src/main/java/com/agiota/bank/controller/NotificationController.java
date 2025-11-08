@@ -39,10 +39,42 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
+    @GetMapping("/user/{userId}")
+    @Operation(summary = "Listar notificações de um usuário específico (para testes)")
+    public ResponseEntity<List<NotificationResponseDTO>> getNotificationsForUser(@PathVariable Long userId) {
+        List<NotificationResponseDTO> notifications = notificationService.getNotificationsForUser(userId);
+        return ResponseEntity.ok(notifications);
+    }
+
+    @PutMapping("/{notificationId}/mark-read")
+    @Operation(summary = "Marcar notificação como lida")
+    public ResponseEntity<Void> markAsRead(@PathVariable Long notificationId) {
+        notificationService.markAsRead(notificationId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/user/{userId}/mark-all-read")
+    @Operation(summary = "Marcar todas as notificações do usuário como lidas")
+    public ResponseEntity<Void> markAllAsReadForUser(@PathVariable Long userId) {
+        notificationService.markAllAsReadForUser(userId);
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Excluir notificação")
     public ResponseEntity<Void> deleteNotification(@PathVariable Long id) {
         notificationService.deleteNotification(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/test-email/{email}")
+    @Operation(summary = "Testar envio de email")
+    public ResponseEntity<String> testEmail(@PathVariable String email) {
+        try {
+            notificationService.testEmailConnection(email);
+            return ResponseEntity.ok("Email de teste enviado com sucesso para: " + email);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erro ao enviar email: " + e.getMessage());
+        }
     }
 }

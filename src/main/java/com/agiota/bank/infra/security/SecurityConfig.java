@@ -38,7 +38,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/user").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/**").permitAll()
 
                         // Configuração do Swagger
                         .requestMatchers(

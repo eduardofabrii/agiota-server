@@ -9,6 +9,7 @@ import com.agiota.bank.model.account.Account;
 import com.agiota.bank.model.beneficiary.Beneficiary;
 import com.agiota.bank.repository.AccountRepository;
 import com.agiota.bank.repository.BeneficiaryRepository;
+import com.agiota.bank.service.notification.NotificationService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
     private final BeneficiaryRepository beneficiaryRepository;
     private final AccountRepository accountRepository;
     private final BeneficiaryMapper beneficiaryMapper;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional(readOnly = true)
@@ -37,7 +39,6 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
     public BeneficiaryResponseDTO create(Long ownerAccountId, BeneficiaryRequestDTO requestDTO) {
         Account ownerAccount = validateAccountExists(ownerAccountId);
         
-        // Validações customizadas
         validateBeneficiaryData(requestDTO);
         
         String normalizedCpfCnpj = normalizeCpfCnpj(requestDTO.cpfCnpj());
@@ -57,6 +58,8 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
 
         Beneficiary beneficiary = beneficiaryMapper.toBeneficiary(normalizedDTO, ownerAccount);
         Beneficiary savedBeneficiary = beneficiaryRepository.save(beneficiary);
+        
+        notificationService.notifyBeneficiaryAdded(ownerAccount.getUser(), savedBeneficiary.getName());
         
         return beneficiaryMapper.toBeneficiaryResponse(savedBeneficiary);
     }
@@ -93,6 +96,9 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
         existingBeneficiary.setUpdatedAt(LocalDateTime.now());
 
         Beneficiary updatedBeneficiary = beneficiaryRepository.save(existingBeneficiary);
+        
+        notificationService.notifyBeneficiaryUpdated(existingBeneficiary.getOwnerAccount().getUser(), updatedBeneficiary.getName());
+        
         return beneficiaryMapper.toBeneficiaryResponse(updatedBeneficiary);
     }
 
@@ -102,7 +108,8 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
         validateAccountExists(ownerAccountId);
         Beneficiary beneficiary = findBeneficiaryByIdAndOwnerAccount(id, ownerAccountId);
         
-        // TO DO: Implementar a Regra R-4: Verificar se não há transferências agendadas
+        notificationService.notifyBeneficiaryDeleted(beneficiary.getOwnerAccount().getUser(), beneficiary.getName());
+        
         
         beneficiaryRepository.delete(beneficiary);
     }

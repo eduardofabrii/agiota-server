@@ -11,6 +11,7 @@ import com.agiota.bank.model.transaction.TransactionType;
 import com.agiota.bank.repository.AccountRepository;
 import com.agiota.bank.repository.PixKeyRepository;
 import com.agiota.bank.repository.TransactionRepository;
+import com.agiota.bank.service.notification.NotificationService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMapper transactionMapper;
     private final PixKeyRepository pixKeyRepository;
     private final AccountRepository accountRepository;
+    private final NotificationService notificationService;
     @Override
     public List<TransactionResponseDTO> listAccountTransactionsSent(Long acountId) {
         List<Transaction> transactions = transactionRepository.findByOriginAccountId(acountId);
@@ -36,22 +38,51 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public TransactionResponseDTO create(TransactionRequestDTO postRequest, Long originUserId) {
+    public TransactionResponseDTO create(TransactionRequestDTO postRequest, Long originAccountId) {
         TransactionType type = postRequest.type();
-        Long destinationUserId;
+        Long destinationAccountId;
+        Account originAccount = accountRepository.findById(originAccountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Origin account not found"));
+        Account destinationAccount;
+        
         if (type == TransactionType.PIX) {
             String pixKey = postRequest.destinationPixKey();
-            PixKey pixKeyEntity = pixKeyRepository.findByKeyValue(pixKey).orElseThrow(() -> new ResourceNotFoundException("PixKey not found"));
-            destinationUserId = pixKeyEntity.getAccount().getId();
-        }
-        else {
+            PixKey pixKeyEntity = pixKeyRepository.findByKeyValue(pixKey)
+                    .orElseThrow(() -> new ResourceNotFoundException("PixKey not found"));
+            destinationAccountId = pixKeyEntity.getAccount().getId();
+            destinationAccount = pixKeyEntity.getAccount();
+        } else {
             String agency = postRequest.destinationAgency();
             String accountNumber = postRequest.destinationAccountNumber();
-            Account destinationAccount = accountRepository.findByAgencyAndAccountNumber(agency, accountNumber).orElseThrow(() -> new ResourceNotFoundException("Account not found"));
-            destinationUserId = destinationAccount.getId();
+            destinationAccount = accountRepository.findByAgencyAndAccountNumber(agency, accountNumber)
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+            destinationAccountId = destinationAccount.getId();
         }
-        Transaction transaction = transactionMapper.toTransactionPostRequest(postRequest, originUserId, destinationUserId);
+        
+        Transaction transaction = transactionMapper.toTransactionPostRequest(postRequest, originAccountId, destinationAccountId);
         Transaction savedTransaction = transactionRepository.save(transaction);
+        
+        String transactionTypeStr = type.toString();
+        double amount = postRequest.value().doubleValue();
+        
+        String destinationInfo = type == TransactionType.PIX ? 
+                postRequest.destinationPixKey() : 
+                destinationAccount.getAgency() + " / " + destinationAccount.getAccountNumber();
+        notificationService.notifyTransactionSent(
+                originAccount.getUser(), 
+                amount, 
+                destinationInfo, 
+                transactionTypeStr
+        );
+        
+        String originInfo = originAccount.getAgency() + " / " + originAccount.getAccountNumber();
+        notificationService.notifyTransactionReceived(
+                destinationAccount.getUser(), 
+                amount, 
+                originInfo, 
+                transactionTypeStr
+        );
+        
         return transactionMapper.toTransactionPostResponse(savedTransaction);
     }
 
