@@ -40,7 +40,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionResponseDTO create(TransactionRequestDTO postRequest, Long originAccountId) {
         TransactionType type = postRequest.type();
-        Long destinationAccountId;
         Account originAccount = accountRepository.findById(originAccountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Origin account not found"));
         Account destinationAccount;
@@ -49,17 +48,15 @@ public class TransactionServiceImpl implements TransactionService {
             String pixKey = postRequest.destinationPixKey();
             PixKey pixKeyEntity = pixKeyRepository.findByKeyValue(pixKey)
                     .orElseThrow(() -> new ResourceNotFoundException("PixKey not found"));
-            destinationAccountId = pixKeyEntity.getAccount().getId();
             destinationAccount = pixKeyEntity.getAccount();
         } else {
             String agency = postRequest.destinationAgency();
             String accountNumber = postRequest.destinationAccountNumber();
             destinationAccount = accountRepository.findByAgencyAndAccountNumber(agency, accountNumber)
                     .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
-            destinationAccountId = destinationAccount.getId();
         }
         
-        Transaction transaction = transactionMapper.toTransactionPostRequest(postRequest, originAccountId, destinationAccountId);
+        Transaction transaction = transactionMapper.toTransactionPostRequest(postRequest, originAccount, destinationAccount);
         Transaction savedTransaction = transactionRepository.save(transaction);
         
         String transactionTypeStr = type.toString();
