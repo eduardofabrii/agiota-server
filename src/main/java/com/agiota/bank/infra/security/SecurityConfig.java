@@ -1,5 +1,9 @@
 package com.agiota.bank.infra.security;
 
+import com.agiota.bank.exception.ErrorResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,12 +21,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.agiota.bank.exception.ErrorResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -37,7 +35,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/user").permitAll()
 
                         // Configuração do Swagger
@@ -48,7 +46,8 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/swagger-resources"
                         ).permitAll()
-                        
+
+                        .requestMatchers(HttpMethod.POST, "/v1/support-tickets").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/v1/notifications/**").hasRole("USER") 
                         .requestMatchers(HttpMethod.DELETE, "/v1/notifications/**").hasRole("USER") 
                         .requestMatchers(HttpMethod.POST, "/v1/**").hasRole("ADMIN")
@@ -70,7 +69,7 @@ public class SecurityConfig {
         return (request, response, accessDeniedException) -> {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType("application/json");
-            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Access Denied", accessDeniedException.getMessage());
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Acesso Negado", "Você não tem permissão para acessar este recurso.");
             response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
         };
     }
@@ -79,7 +78,7 @@ public class SecurityConfig {
         return (request, response, authException) -> {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
-            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Unauthorized", authException.getMessage());
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Não Autorizado", "Token de autenticação inválido ou expirado.");
             response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
         };
     }
