@@ -47,6 +47,9 @@ public class SecurityConfig {
                                 "/swagger-resources"
                         ).permitAll()
 
+                        .requestMatchers(HttpMethod.POST, "/v1/loans").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/v1/loans/{id}/pay").hasRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/v1/loans/{id}/approval").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/v1/support-tickets").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/v1/notifications/**").hasRole("USER") 
                         .requestMatchers(HttpMethod.DELETE, "/v1/notifications/**").hasRole("USER") 
