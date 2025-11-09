@@ -1,5 +1,6 @@
 package com.agiota.bank.dto.response;
 
+import com.agiota.bank.model.notification.NotificationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ public class NotificationResponseDTO {
     private Long user_id;
     private String userName;
     private String message;
+    private NotificationType type;
     private LocalDateTime createdAt;
     private boolean isRead;
 }

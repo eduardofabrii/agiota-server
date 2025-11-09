@@ -13,6 +13,7 @@ import com.agiota.bank.model.user.User;
 import com.agiota.bank.repository.AccountRepository;
 import com.agiota.bank.repository.PixKeyRepository;
 import com.agiota.bank.repository.TransactionRepository;
+import com.agiota.bank.service.notification.NotificationService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;

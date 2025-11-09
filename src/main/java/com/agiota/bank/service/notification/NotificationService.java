@@ -2,34 +2,52 @@ package com.agiota.bank.service.notification;
 
 import com.agiota.bank.dto.request.NotificationRequestDTO;
 import com.agiota.bank.dto.response.NotificationResponseDTO;
+// Importação da sua exceção customizada (o "erro codificado")
+import com.agiota.bank.exception.ResourceNotFoundException; 
 import com.agiota.bank.model.notification.Notification;
 import com.agiota.bank.model.user.User;
 import com.agiota.bank.repository.NotificationRepository;
 import com.agiota.bank.repository.UserRepository;
+import com.agiota.bank.service.notification.NotificationMessageTemplate.NotificationMessage;
+import freemarker.template.Configuration; 
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import jakarta.mail.internet.MimeMessage; 
 import lombok.RequiredArgsConstructor;
-import org.springframework.mail.SimpleMailMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper; 
 import org.springframework.stereotype.Service;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils; 
+import org.springframework.beans.factory.annotation.Value; 
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final JavaMailSender mailSender;
+    
+    private final Configuration freemarkerConfig;
+
+    @Value("${spring.mail.username}")
+    private String mailFromUsername;
 
     public NotificationResponseDTO createAndSendNotification(NotificationRequestDTO requestDTO) {
         User recipient = userRepository.findById(requestDTO.getUser_id())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
         
         Notification notification = new Notification(recipient, requestDTO.getMessage());
         notification = notificationRepository.save(notification);
 
-        // Enviar email se subject foi fornecido
         if (requestDTO.getSubject() != null && !requestDTO.getSubject().trim().isEmpty()) {
             sendEmailNotification(recipient.getEmail(), requestDTO.getSubject(), requestDTO.getMessage());
         }
@@ -44,16 +62,122 @@ public class NotificationService {
         sendEmailNotification(recipient.getEmail(), subject, message);
     }
 
+    
+     public void notifyUserCreated(User user) {
+        NotificationMessage template = NotificationMessageTemplate.userCreatedMessage(user.getName());
+        createNotificationWithType(user, template);
+    }
+
+    public void notifyAccountCreated(User user, String accountNumber, String agency) {
+        NotificationMessage template = NotificationMessageTemplate.createAccountMessage(accountNumber, agency);
+        createNotificationWithType(user, template);
+    }
+
+    public void notifyAccountUpdated(User user, String accountNumber) {
+        NotificationMessage template = NotificationMessageTemplate.updateAccountMessage(accountNumber);
+        createNotificationWithType(user, template);
+    }
+
+    public void notifyAccountDeleted(User user, String accountNumber) {
+        NotificationMessage template = NotificationMessageTemplate.deleteAccountMessage(accountNumber);
+        createNotificationWithType(user, template);
+    }
+ 
+    public void notifyPixKeyCreated(User user, String pixKey, String keyType) {
+        NotificationMessage template = NotificationMessageTemplate.createPixKeyMessage(pixKey, keyType);
+        createNotificationWithType(user, template);
+    }
+
+    public void notifyPixKeyDeleted(User user, String pixKey) {
+        NotificationMessage template = NotificationMessageTemplate.deletePixKeyMessage(pixKey);
+        createNotificationWithType(user, template);
+    }
+
+    public void notifyTransactionSent(User user, double amount, String destinationInfo, String transactionType) {
+        NotificationMessage template = NotificationMessageTemplate.transactionSentMessage(amount, destinationInfo, transactionType);
+        createNotificationWithType(user, template);
+    }
+
+    public void notifyTransactionReceived(User user, double amount, String originInfo, String transactionType) {
+        NotificationMessage template = NotificationMessageTemplate.transactionReceivedMessage(amount, originInfo, transactionType);
+        createNotificationWithType(user, template);
+    }
+
+    public void notifyCardCreated(User user, String cardNumber, String cardType) {
+        NotificationMessage template = NotificationMessageTemplate.createCardMessage(cardNumber, cardType);
+        createNotificationWithType(user, template);
+    }
+
+    public void notifyCardUpdated(User user, String maskedCardNumber) {
+        NotificationMessage template = NotificationMessageTemplate.updateCardMessage(maskedCardNumber);
+        createNotificationWithType(user, template);
+    }
+
+    public void notifyCardDeleted(User user, String maskedCardNumber) {
+        NotificationMessage template = NotificationMessageTemplate.deleteCardMessage(maskedCardNumber);
+        createNotificationWithType(user, template);
+    }
+
+    public void notifyBeneficiaryAdded(User user, String beneficiaryName) {
+        NotificationMessage template = NotificationMessageTemplate.addBeneficiaryMessage(beneficiaryName);
+        createNotificationWithType(user, template);
+    }
+
+    public void notifyBeneficiaryUpdated(User user, String beneficiaryName) {
+        NotificationMessage template = NotificationMessageTemplate.updateBeneficiaryMessage(beneficiaryName);
+        createNotificationWithType(user, template);
+    }
+
+    public void notifyBeneficiaryDeleted(User user, String beneficiaryName) {
+        NotificationMessage template = NotificationMessageTemplate.deleteBeneficiaryMessage(beneficiaryName);
+        createNotificationWithType(user, template);
+    }
+
+    public void notifySecurityAlert(User user, String action) {
+        NotificationMessage template = NotificationMessageTemplate.securityAlertMessage(action);
+        createNotificationWithType(user, template);
+        log.warn("Alerta de segurança enviado para usuário ID: {} - Ação: {}", user.getId(), action);
+    }
+
+
+    private void createNotificationWithType(User user, NotificationMessage template) {
+        try {
+            Notification notification = new Notification(user, template.getMessage(), template.getType());
+            notificationRepository.save(notification);
+            
+            sendEmailNotification(user.getEmail(), template.getSubject(), template.getMessage());
+        } catch (Exception e) {
+            log.error("Erro ao enviar notificação {} para usuário {}: {}", template.getType(), user.getEmail(), e.getMessage());
+        }
+    }
+
+    /**
+     * MÉTODO sendEmailNotification REFATORADO para usar FTL e MimeMessage
+     */
     private void sendEmailNotification(String to, String subject, String text) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("noreply@agiotabank.com");
-            message.setTo(to);
-            message.setSubject(subject);
-            message.setText(text);
-            mailSender.send(message);
-        } catch (Exception e) {
-            System.err.println("Erro ao enviar e-mail: " + e.getMessage());
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // true = multipart, UTF-8
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("subject", subject);
+            model.put("messageBody", text); 
+
+            Template ftlTemplate = freemarkerConfig.getTemplate("email-template.ftl");
+            String htmlBody = FreeMarkerTemplateUtils.processTemplateIntoString(ftlTemplate, model);
+
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(htmlBody, true); 
+            
+            helper.setFrom(mailFromUsername, "Agiota Bank"); 
+
+            mailSender.send(mimeMessage); 
+
+            
+        } catch (Exception e) { 
+            log.error("❌ Erro ao enviar e-mail (HTML) via SMTP para: {} - Erro: {}", to, e.getMessage());
+            log.error("❌ Stack trace completo:", e);
         }
     }
 
@@ -64,12 +188,49 @@ public class NotificationService {
                 .collect(Collectors.toList());
     }
 
+    public List<NotificationResponseDTO> getAllNotifications() {
+        List<Notification> notifications = notificationRepository.findAll();
+        return notifications.stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<NotificationResponseDTO> updatedNotifications(Long userId) {
+        List<Notification> notifications = notificationRepository.findByRecipientIdOrderByCreatedAtDesc(userId);
+        notifications.forEach(notification -> notification.setRead(true));
+        notificationRepository.saveAll(notifications);
+        return notifications.stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public NotificationResponseDTO getNotificationById(Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Notificação não encontrada"));
+        return convertToResponseDTO(notification);
+    }
+
     public void deleteNotification(Long notificationId) {
         if (!notificationRepository.existsById(notificationId)) {
-            throw new RuntimeException("Notificação não encontrada");
+            throw new ResourceNotFoundException("Notificação não encontrada");
         }
         notificationRepository.deleteById(notificationId);
     }
+
+    public void markAsRead(Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Notificação não encontrada"));
+        notification.setRead(true);
+        notificationRepository.save(notification);
+    }
+
+    public void markAllAsReadForUser(Long userId) {
+        List<Notification> notifications = notificationRepository.findByRecipientIdOrderByCreatedAtDesc(userId);
+        notifications.forEach(notification -> notification.setRead(true));
+        notificationRepository.saveAll(notifications);
+    }
+
+
 
     private NotificationResponseDTO convertToResponseDTO(Notification notification) {
         return new NotificationResponseDTO(
@@ -77,6 +238,7 @@ public class NotificationService {
                 notification.getRecipient().getId(),
                 notification.getRecipient().getName(),
                 notification.getMessage(),
+                notification.getType(),
                 notification.getCreatedAt(),
                 notification.isRead()
         );

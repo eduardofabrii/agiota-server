@@ -6,7 +6,9 @@ import com.agiota.bank.exception.ResourceAlreadyExistsException;
 import com.agiota.bank.exception.ResourceNotFoundException;
 import com.agiota.bank.mapper.PixKeyMapper;
 import com.agiota.bank.model.pixkey.PixKey;
+import com.agiota.bank.repository.AccountRepository;
 import com.agiota.bank.repository.PixKeyRepository;
+import com.agiota.bank.service.notification.NotificationService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,8 @@ import java.util.List;
 public class PixKeyServiceImpl implements PixKeyService {
     private final PixKeyRepository pixKeyRepository;
     private final PixKeyMapper mapper;
+    private final AccountRepository accountRepository;
+    private final NotificationService notificationService;
 
     @Override
     public PixKeyResponseDTO createPixKey(PixKeyRequestDTO dto, Long accountId) {
@@ -25,6 +29,15 @@ public class PixKeyServiceImpl implements PixKeyService {
         }
         PixKey pixKey = mapper.toPixKeyPostRequest(dto, accountId);
         pixKeyRepository.save(pixKey);
+        
+        accountRepository.findById(accountId).ifPresent(account -> {
+            notificationService.notifyPixKeyCreated(
+                account.getUser(), 
+                pixKey.getKeyValue(), 
+                pixKey.getType().toString()
+            );
+        });
+        
         return mapper.toPixKeyPostResponse(pixKey);
     }
 
@@ -43,9 +56,11 @@ public class PixKeyServiceImpl implements PixKeyService {
 
     @Override
     public void deletePixKey(String keyValue) {
-        if (!pixKeyRepository.existsById(keyValue)) {
-            throw new ResourceNotFoundException("PixKey not found");
-        }
+        PixKey pixKey = pixKeyRepository.findByKeyValue(keyValue)
+                .orElseThrow(() -> new ResourceNotFoundException("PixKey not found"));
+        
+        notificationService.notifyPixKeyDeleted(pixKey.getAccount().getUser(), keyValue);
+        
         pixKeyRepository.deleteById(keyValue);
     }
 }
