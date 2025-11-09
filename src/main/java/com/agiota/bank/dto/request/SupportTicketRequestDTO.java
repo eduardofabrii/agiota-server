@@ -1,18 +1,12 @@
 package com.agiota.bank.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class SupportTicketRequestDTO {
+public record SupportTicketRequestDTO(
+        @NotBlank
+        String title,
 
-    @NotBlank
-    private String title;
-
-    @NotBlank
-    private String description;
+        @NotBlank
+        String description
+) {
 }

@@ -5,38 +5,27 @@ import com.agiota.bank.dto.request.UpdateSupportTicketRequestDTO;
 import com.agiota.bank.dto.response.SupportTicketResponseDTO;
 import com.agiota.bank.model.supportticket.SupportTicket;
 import com.agiota.bank.model.user.User;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
 
-@Component
-public class SupportTicketMapper {
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface SupportTicketMapper {
 
-    public SupportTicket toEntity(SupportTicketRequestDTO dto, User user) {
-        SupportTicket supportTicket = new SupportTicket();
-        supportTicket.setUser(user);
-        supportTicket.setTitle(dto.getTitle());
-        supportTicket.setDescription(dto.getDescription());
-        return supportTicket;
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "response", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "user", source = "user")
+    SupportTicket toEntity(SupportTicketRequestDTO dto, User user);
 
-    public SupportTicketResponseDTO toResponse(SupportTicket entity) {
-        SupportTicketResponseDTO response = new SupportTicketResponseDTO();
-        response.setId(entity.getId());
-        response.setUserId(entity.getUser().getId());
-        response.setTitle(entity.getTitle());
-        response.setDescription(entity.getDescription());
-        response.setStatus(entity.getStatus());
-        response.setResponse(entity.getResponse());
-        response.setCreatedAt(entity.getCreatedAt());
-        response.setUpdatedAt(entity.getUpdatedAt());
-        return response;
-    }
+    @Mapping(source = "user.id", target = "userId")
+    SupportTicketResponseDTO toResponse(SupportTicket entity);
 
-    public void updateEntityFromDto(UpdateSupportTicketRequestDTO dto, SupportTicket entity) {
-        if (dto.getStatus() != null) {
-            entity.setStatus(dto.getStatus());
-        }
-        if (dto.getResponse() != null) {
-            entity.setResponse(dto.getResponse());
-        }
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "title", ignore = true)
+    @Mapping(target = "description", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    void updateEntityFromDto(UpdateSupportTicketRequestDTO dto, @MappingTarget SupportTicket entity);
 }

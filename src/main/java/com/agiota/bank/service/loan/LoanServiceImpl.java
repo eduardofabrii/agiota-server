@@ -33,8 +33,8 @@ public class LoanServiceImpl implements LoanService {
     @Override
     @Transactional
     public LoanResponseDTO create(CreateLoanRequestDTO request, User user) {
-        Account account = accountRepository.findById(request.getAccountId())
-                .orElseThrow(() -> new ResourceNotFoundException("Conta não encontrada com o ID: " + request.getAccountId()));
+        Account account = accountRepository.findById(request.accountId())
+                .orElseThrow(() -> new ResourceNotFoundException("Conta não encontrada com o ID: " + request.accountId()));
 
 
         if (!account.getUser().getId().equals(user.getId())) {
@@ -68,12 +68,12 @@ public class LoanServiceImpl implements LoanService {
         Loan loan = loanRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado com o ID: " + id));
 
-        if (request.getStatus() == LoanStatus.APPROVED) {
-            if (request.getInterestRate() == null || request.getInterestRate().compareTo(BigDecimal.ZERO) < 0) {
+        if (request.status() == LoanStatus.APPROVED) {
+            if (request.interestRate() == null || request.interestRate().compareTo(BigDecimal.ZERO) < 0) {
                 throw new InvalidBankDataException("A taxa de juros deve ser fornecida e não pode ser negativa para aprovação.");
             }
             loan.setStatus(LoanStatus.APPROVED);
-            loan.setInterestRate(request.getInterestRate());
+            loan.setInterestRate(request.interestRate());
 
             BigDecimal totalAmount = loan.getAmount().multiply(BigDecimal.ONE.add(loan.getInterestRate()));
             BigDecimal installmentValue = totalAmount.divide(new BigDecimal(loan.getInstallments()), 2, RoundingMode.HALF_UP);
@@ -83,7 +83,7 @@ public class LoanServiceImpl implements LoanService {
             account.setBalance(account.getBalance().add(loan.getAmount()));
             accountRepository.save(account);
 
-        } else if (request.getStatus() == LoanStatus.REJECTED) {
+        } else if (request.status() == LoanStatus.REJECTED) {
             loan.setStatus(LoanStatus.REJECTED);
         } else {
             throw new InvalidBankDataException("O status de aprovação deve ser APROVADO ou REJEITADO.");
