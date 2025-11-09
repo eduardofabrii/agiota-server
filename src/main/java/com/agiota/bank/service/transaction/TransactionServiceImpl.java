@@ -46,7 +46,6 @@ public class TransactionServiceImpl implements TransactionService {
         Account originAccount = accountRepository.findById(request.originAccountId())
                 .orElseThrow(() -> new ResourceNotFoundException("Conta de origem não encontrada com o ID: " + request.originAccountId()));
 
-        // Validação de segurança: a conta de origem pertence ao usuário logado?
         if (!originAccount.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException("Você não tem permissão para realizar transações a partir desta conta.");
         }
@@ -89,17 +88,25 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public TransactionResponseDTO update(Long id, TransactionRequestDTO dto) {
         Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found"));
-        transactionRepository.save(transaction);
-        return transactionMapper.toTransactionResponse(transaction);
+                .orElseThrow(() -> new ResourceNotFoundException("Transação não encontrada com o ID: " + id));
+        if (dto.amount() != null) {
+            transaction.setAmount(dto.amount());
+        }
+        if (dto.type() != null) {
+            transaction.setType(dto.type());
+        }
+        
+        Transaction updatedTransaction = transactionRepository.save(transaction);
+        return transactionMapper.toTransactionResponse(updatedTransaction);
     }
 
     @Override
     public void delete(Long id) {
         if (!transactionRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Transaction not found");
+            throw new ResourceNotFoundException("Transação não encontrada com o ID: " + id);
         }
         transactionRepository.deleteById(id);
     }
