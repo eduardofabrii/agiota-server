@@ -27,6 +27,19 @@ public class NotificationMessageTemplate {
         return new NotificationMessage(subject, message, NotificationType.ACCOUNT_CREATED);
     }
 
+    public static NotificationMessage userCreatedMessage(String userName) {
+        String subject = "Bem-vindo ao Agiota Bank!";
+        String message = String.format(
+                "Olá %s,\n\n" +
+                        "Estamos muito felizes em tê-lo conosco no Agiota Bank. Sua conta foi criada com sucesso e você agora pode aproveitar todos os nossos serviços bancários.\n\n" +
+                        "Se precisar de ajuda ou tiver alguma dúvida, nossa equipe de suporte está sempre à disposição para ajudá-lo.\n\n" +
+                        "Atenciosamente,\n" +
+                        "Equipe Agiota Bank",
+                userName
+        );
+        return new NotificationMessage(subject, message, NotificationType.USER_CREATED);
+    }
+
     public static NotificationMessage updateAccountMessage(String accountNumber) {
         String subject = "Conta Atualizada - Agiota Bank";
         String message = String.format(

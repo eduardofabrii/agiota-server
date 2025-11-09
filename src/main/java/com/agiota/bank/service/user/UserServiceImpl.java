@@ -11,6 +11,7 @@ import com.agiota.bank.exception.ResourceNotFoundException;
 import com.agiota.bank.mapper.UserMapper;
 import com.agiota.bank.model.user.User;
 import com.agiota.bank.repository.UserRepository;
+import com.agiota.bank.service.notification.NotificationService;
 
 import lombok.AllArgsConstructor;
 
@@ -21,6 +22,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper mapper;
+        private final NotificationService notificationService;
+
 
     @Override
     public List<UserResponseDTO> listAll() {
@@ -31,6 +34,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO create(UserRequestDTO postRequest) {
         User user = mapper.toUserPostRequest(postRequest);
         userRepository.save(user);
+        notificationService.notifyUserCreated(user);
         return mapper.toUserPostResponse(user);
     }
 

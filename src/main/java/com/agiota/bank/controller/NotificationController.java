@@ -67,14 +67,5 @@ public class NotificationController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/test-email/{email}")
-    @Operation(summary = "Testar envio de email")
-    public ResponseEntity<String> testEmail(@PathVariable String email) {
-        try {
-            notificationService.testEmailConnection(email);
-            return ResponseEntity.ok("Email de teste enviado com sucesso para: " + email);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erro ao enviar email: " + e.getMessage());
-        }
-    }
+   
 }

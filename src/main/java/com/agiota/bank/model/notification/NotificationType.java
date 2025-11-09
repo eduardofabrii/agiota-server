@@ -1,6 +1,9 @@
 package com.agiota.bank.model.notification;
 
 public enum NotificationType {
+
+    USER_CREATED("Usuário Criado"),
+
     ACCOUNT_CREATED("Conta Criada"),
     ACCOUNT_UPDATED("Conta Atualizada"),
     ACCOUNT_DELETED("Conta Excluída"),
