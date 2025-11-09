@@ -19,7 +19,7 @@ public class Transaction {
     private Long id;
 
     @Column(nullable = false)
-    private BigDecimal value;
+    private BigDecimal amount;
 
     @Column(nullable = false)
     private LocalDateTime date = LocalDateTime.now();

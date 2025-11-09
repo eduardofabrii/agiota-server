@@ -2,12 +2,14 @@ package com.agiota.bank.controller;
 
 import com.agiota.bank.dto.request.TransactionRequestDTO;
 import com.agiota.bank.dto.response.TransactionResponseDTO;
+import com.agiota.bank.model.user.User;
 import com.agiota.bank.service.transaction.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -39,10 +41,10 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.listAccountTransactionsReceived(id));
     }
 
-    @PostMapping("/{originAccountId}")
+    @PostMapping
     @Operation(summary = "Criar nova transação")
-    public ResponseEntity<TransactionResponseDTO> create(@Valid @RequestBody TransactionRequestDTO dto, @PathVariable Long originAccountId) {
-        TransactionResponseDTO response = transactionService.create(dto, originAccountId);
+    public ResponseEntity<TransactionResponseDTO> create(@Valid @RequestBody TransactionRequestDTO dto, @AuthenticationPrincipal User user) {
+        TransactionResponseDTO response = transactionService.create(dto, user);
         
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -64,6 +66,4 @@ public class TransactionController {
     public ResponseEntity<TransactionResponseDTO> update(@Valid @RequestBody TransactionRequestDTO dto, @PathVariable Long id) {
         return ResponseEntity.ok(transactionService.update(id, dto));
     }
-
-
 }
