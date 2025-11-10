@@ -2,7 +2,8 @@ package com.agiota.bank.service.cards;
 
 import com.agiota.bank.dto.request.CardRequestDTO;
 import com.agiota.bank.dto.response.CardResponseDTO;
-import com.agiota.bank.exception.ResourceNotFoundException;
+import com.agiota.bank.exception.CardException;
+import com.agiota.bank.exception.ErrorCode;
 import com.agiota.bank.mapper.CardMapper;
 import com.agiota.bank.model.cards.Card;
 import com.agiota.bank.repository.CardRepository;
@@ -20,6 +21,9 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public CardResponseDTO create(CardRequestDTO dto) {
+        cardRepository.findByNumber(dto.number()).ifPresent(card -> {
+            throw new CardException(ErrorCode.CARD_ALREADY_EXISTS);
+        });
         Card card = cardMapper.toCardPostRequest(dto);
         card = cardRepository.save(card);
         return cardMapper.toCardPostResponse(card);
@@ -28,7 +32,7 @@ public class CardServiceImpl implements CardService {
     @Override
     public CardResponseDTO getById(Long id) {
         Card card = cardRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
+                .orElseThrow(() -> new CardException(ErrorCode.CARD_NOT_FOUND));
         return cardMapper.toCardPostResponse(card);
     }
 
@@ -40,7 +44,7 @@ public class CardServiceImpl implements CardService {
     @Override
     public CardResponseDTO update(Long id, CardRequestDTO dto) {
         Card card = cardRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
+                .orElseThrow(() -> new CardException(ErrorCode.CARD_NOT_FOUND));
         card.setNumber(dto.number());
         card.setHolderName(dto.holderName());
         card.setExpirationDate(dto.expirationDate());
@@ -51,6 +55,9 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public void delete(Long id) {
+        if (!cardRepository.existsById(id)) {
+            throw new CardException(ErrorCode.CARD_NOT_FOUND);
+        }
         cardRepository.deleteById(id);
     }
 }
