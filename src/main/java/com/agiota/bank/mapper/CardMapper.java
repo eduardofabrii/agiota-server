@@ -14,8 +14,10 @@ import com.agiota.bank.dto.response.CardResponseDTO;
 public interface CardMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "account.id", source = "accountId")
     Card toCardPostRequest(CardRequestDTO cardRequest);
 
+    @Mapping(target = "accountId", source = "account.id")
     CardResponseDTO toCardPostResponse(Card card);
 
     List<CardResponseDTO> toCardListResponse(List<Card> cards);

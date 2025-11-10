@@ -1,5 +1,6 @@
 package com.agiota.bank.model.cards;
 
+import com.agiota.bank.model.account.Account;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +14,7 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String number;
 
     @Column(nullable = false)
@@ -24,4 +25,8 @@ public class Card {
 
     @Column(nullable = false)
     private String cvv;
+
+    @JoinColumn(nullable = false, name = "account_id", updatable = false)
+    @ManyToOne
+    private Account account;
 }
