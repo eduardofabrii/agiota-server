@@ -9,6 +9,7 @@ import java.util.List;
 public interface TransactionService {
     List<TransactionResponseDTO> listAccountTransactionsSent(Long accountId);
     List<TransactionResponseDTO> listAccountTransactionsReceived(Long accountId);
+    List<TransactionResponseDTO> listAllTransactions();
     TransactionResponseDTO create(TransactionRequestDTO request, User user);
     TransactionResponseDTO listTransactionById(Long id);
     TransactionResponseDTO update(Long id, TransactionRequestDTO dto);

@@ -42,6 +42,12 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    public List<TransactionResponseDTO> listAllTransactions() {
+        List<Transaction> transactions = transactionRepository.findAll();
+        return transactionMapper.toTransactionListResponse(transactions);
+    }
+
+    @Override
     @Transactional
     public TransactionResponseDTO create(TransactionRequestDTO request, User user) {
         Account originAccount = accountRepository.findById(request.originAccountId())
@@ -77,7 +83,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         Transaction transaction = transactionMapper.toTransaction(request, originAccount, destinationAccount);
         Transaction savedTransaction = transactionRepository.save(transaction);
-        
+
         return transactionMapper.toTransactionResponse(savedTransaction);
     }
 

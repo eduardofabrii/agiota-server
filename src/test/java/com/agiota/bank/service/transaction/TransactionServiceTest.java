@@ -23,6 +23,8 @@ import org.springframework.security.access.AccessDeniedException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -102,6 +104,23 @@ class TransactionServiceTest {
                 "Success",
                 transaction.getDate()
         );
+    }
+
+    @Test
+    void listAllTransactions_shouldReturnAllTransactions() {
+        // Arrange
+        List<Transaction> transactions = Collections.singletonList(transaction);
+        List<TransactionResponseDTO> transactionResponses = Collections.singletonList(transactionResponse);
+        when(transactionRepository.findAll()).thenReturn(transactions);
+        when(transactionMapper.toTransactionListResponse(transactions)).thenReturn(transactionResponses);
+
+        // Act
+        List<TransactionResponseDTO> result = transactionService.listAllTransactions();
+
+        // Assert
+        assertThat(result).isEqualTo(transactionResponses);
+        verify(transactionRepository).findAll();
+        verify(transactionMapper).toTransactionListResponse(transactions);
     }
 
     @Test

@@ -118,6 +118,21 @@ class TransactionControllerTest {
     }
 
     @Test
+    void listAllTransactions_shouldReturnAllTransactions() {
+        // Arrange
+        List<TransactionResponseDTO> transactions = Collections.singletonList(responseDTO);
+        when(transactionService.listAllTransactions()).thenReturn(transactions);
+
+        // Act
+        ResponseEntity<List<TransactionResponseDTO>> response = transactionController.listAllTransactions();
+
+        // Assert
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(transactions);
+        verify(transactionService).listAllTransactions();
+    }
+
+    @Test
     void create_shouldCreateTransaction() {
         // Arrange
         when(transactionService.create(any(TransactionRequestDTO.class), any(User.class))).thenReturn(responseDTO);

@@ -41,6 +41,12 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.listAccountTransactionsReceived(id));
     }
 
+    @GetMapping("/all")
+    @Operation(summary = "Listar todas as transações")
+    public ResponseEntity<List<TransactionResponseDTO>> listAllTransactions() {
+        return ResponseEntity.ok(transactionService.listAllTransactions());
+    }
+
     @PostMapping
     @Operation(summary = "Criar nova transação")
     public ResponseEntity<TransactionResponseDTO> create(@Valid @RequestBody TransactionRequestDTO dto, @AuthenticationPrincipal User user) {
