@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/support-tickets")
 @RequiredArgsConstructor
-@Tag(name = "Support Tickets")
+@Tag(name = "Tickets de Suporte", description = "Operações relacionadas aos tickets de suporte")
 public class SupportTicketController {
 
     private final SupportTicketService supportTicketService;
