@@ -42,9 +42,9 @@ public class AgiotaBankApplication implements CommandLineRunner {
     }
 
     private static List<Account> getAccounts(User user1, User user2) {
-        Account contaCorrenteEduardo = new Account(user1, "0001", "102030-4", AccountType.CORRENTE, new BigDecimal("5000.00"));
-        Account contaCorrenteJoao = new Account(user2, "0001", "405060-7", AccountType.CORRENTE, new BigDecimal("2500.00"));
-        Account contaPoupancaJoao = new Account(user2, "0001", "405060-8", AccountType.POUPANCA, new BigDecimal("8000.00"));
+        Account contaCorrenteEduardo = new Account(user1, "0001", "1020304", AccountType.CORRENTE, new BigDecimal("5000.00"));
+        Account contaCorrenteJoao = new Account(user2, "0001", "4050607", AccountType.CORRENTE, new BigDecimal("2500.00"));
+        Account contaPoupancaJoao = new Account(user2, "0001", "4050608", AccountType.POUPANCA, new BigDecimal("8000.00"));
 
         return Arrays.asList(contaCorrenteEduardo, contaCorrenteJoao, contaPoupancaJoao);
     }
