@@ -37,7 +37,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/user").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/v1/**").permitAll()
 
                         // Configuração do Swagger
                         .requestMatchers(
@@ -47,6 +46,12 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/swagger-resources"
                         ).permitAll()
+
+                        // Bank Statements - Requer autenticação USER
+                        .requestMatchers(HttpMethod.POST, "/v1/statements").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/v1/statements/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.PATCH, "/v1/statements/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/v1/statements/**").hasRole("USER")
 
                         .requestMatchers(HttpMethod.POST, "/v1/loans").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/v1/loans/{id}/pay").hasRole("USER")
