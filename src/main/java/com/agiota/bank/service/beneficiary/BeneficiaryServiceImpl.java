@@ -1,6 +1,7 @@
 package com.agiota.bank.service.beneficiary;
 
 import com.agiota.bank.dto.request.BeneficiaryRequestDTO;
+import com.agiota.bank.dto.request.BeneficiaryUpdateRequestDTO;
 import com.agiota.bank.dto.response.BeneficiaryResponseDTO;
 import com.agiota.bank.exception.ResourceAlreadyExistsException;
 import com.agiota.bank.exception.ResourceNotFoundException;
@@ -74,31 +75,49 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
 
     @Override
     @Transactional
-    public BeneficiaryResponseDTO update(Long id, Long ownerAccountId, BeneficiaryRequestDTO requestDTO) {
+    public BeneficiaryResponseDTO update(Long id, Long ownerAccountId, BeneficiaryUpdateRequestDTO requestDTO) {
         validateAccountExists(ownerAccountId);
         Beneficiary existingBeneficiary = findBeneficiaryByIdAndOwnerAccount(id, ownerAccountId);
 
-        validateBeneficiaryData(requestDTO);
+        BeneficiaryRequestDTO validationDTO = new BeneficiaryRequestDTO(
+            requestDTO.name() != null ? requestDTO.name() : existingBeneficiary.getName(),
+            requestDTO.cpfCnpj() != null ? requestDTO.cpfCnpj() : existingBeneficiary.getCpfCnpj(),
+            requestDTO.bankCode() != null ? requestDTO.bankCode() : existingBeneficiary.getBankCode(),
+            requestDTO.agency() != null ? requestDTO.agency() : existingBeneficiary.getAgency(),
+            requestDTO.accountNumber() != null ? requestDTO.accountNumber() : existingBeneficiary.getAccountNumber(),
+            requestDTO.accountType() != null ? requestDTO.accountType() : existingBeneficiary.getAccountType()
+        );
+        
+        validateBeneficiaryData(validationDTO);
 
-        String normalizedCpfCnpj = normalizeCpfCnpj(requestDTO.cpfCnpj());
-
-        if (!existingBeneficiary.getCpfCnpj().equals(normalizedCpfCnpj) && 
-            beneficiaryRepository.existsByCpfCnpj(normalizedCpfCnpj)) {
-            throw new ResourceAlreadyExistsException("Beneficiary with CPF/CNPJ " + normalizedCpfCnpj + " already exists");
+        if (requestDTO.cpfCnpj() != null) {
+            String normalizedCpfCnpj = normalizeCpfCnpj(requestDTO.cpfCnpj());
+            if (!existingBeneficiary.getCpfCnpj().equals(normalizedCpfCnpj) && 
+                beneficiaryRepository.existsByCpfCnpj(normalizedCpfCnpj)) {
+                throw new ResourceAlreadyExistsException("Beneficiary with CPF/CNPJ " + normalizedCpfCnpj + " already exists");
+            }
+            existingBeneficiary.setCpfCnpj(normalizedCpfCnpj);
         }
 
-        existingBeneficiary.setName(requestDTO.name());
-        existingBeneficiary.setCpfCnpj(normalizedCpfCnpj);
-        existingBeneficiary.setBankCode(requestDTO.bankCode());
-        existingBeneficiary.setAgency(requestDTO.agency());
-        existingBeneficiary.setAccountNumber(requestDTO.accountNumber());
-        existingBeneficiary.setAccountType(requestDTO.accountType());
+        if (requestDTO.name() != null) {
+            existingBeneficiary.setName(requestDTO.name());
+        }
+        if (requestDTO.bankCode() != null) {
+            existingBeneficiary.setBankCode(requestDTO.bankCode());
+        }
+        if (requestDTO.agency() != null) {
+            existingBeneficiary.setAgency(requestDTO.agency());
+        }
+        if (requestDTO.accountNumber() != null) {
+            existingBeneficiary.setAccountNumber(requestDTO.accountNumber());
+        }
+        if (requestDTO.accountType() != null) {
+            existingBeneficiary.setAccountType(requestDTO.accountType());
+        }
         existingBeneficiary.setUpdatedAt(LocalDateTime.now());
 
         Beneficiary updatedBeneficiary = beneficiaryRepository.save(existingBeneficiary);
-        
         notificationService.notifyBeneficiaryUpdated(existingBeneficiary.getOwnerAccount().getUser(), updatedBeneficiary.getName());
-        
         return beneficiaryMapper.toBeneficiaryResponse(updatedBeneficiary);
     }
 

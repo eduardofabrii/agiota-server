@@ -50,6 +50,20 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO update(Long id, UserRequestDTO dto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        
+        if (dto.name() != null) {
+            user.setName(dto.name());
+        }
+        if (dto.email() != null) {
+            user.setEmail(dto.email());
+        }
+        if (dto.password() != null) {
+            user.setPassword(dto.password());
+        }
+        if (dto.role() != null) {
+            user.setRole(dto.role());
+        }
+        
         userRepository.save(user);
         return mapper.toUserPostResponse(user);
     }
@@ -64,7 +78,7 @@ public class UserServiceImpl implements UserService {
     public void softDelete(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        user.setDeletedAt(LocalDateTime.now());
+        user.setDeletedAt(LocalDateTime.now()); // TODO: verificar regra de negocio
         user.setActive(false);
         userRepository.save(user);
     }

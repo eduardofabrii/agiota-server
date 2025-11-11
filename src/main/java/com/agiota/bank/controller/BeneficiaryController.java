@@ -1,6 +1,7 @@
 package com.agiota.bank.controller;
 
 import com.agiota.bank.dto.request.BeneficiaryRequestDTO;
+import com.agiota.bank.dto.request.BeneficiaryUpdateRequestDTO;
 import com.agiota.bank.dto.response.BeneficiaryResponseDTO;
 import com.agiota.bank.service.beneficiary.BeneficiaryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,7 +56,7 @@ public class BeneficiaryController {
     public ResponseEntity<BeneficiaryResponseDTO> update(
             @PathVariable Long id,
             @PathVariable Long ownerAccountId,
-            @Valid @RequestBody BeneficiaryRequestDTO requestDTO
+            @RequestBody BeneficiaryUpdateRequestDTO requestDTO
     ) {
         return ResponseEntity.ok(beneficiaryService.update(id, ownerAccountId, requestDTO));
     }
