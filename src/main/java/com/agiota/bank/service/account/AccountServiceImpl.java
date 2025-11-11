@@ -221,4 +221,25 @@ public class AccountServiceImpl implements AccountService {
         int number = 10000000 + random.nextInt(90000000);
         return String.valueOf(number);
     }
+
+    @Override
+    @Transactional
+    public AccountResponseDTO createDefaultAccountForUser(User user) {
+        log.info("Creating default account for user ID: {}", user.getId());
+
+        Account account = new Account();
+        account.setUser(user);
+        account.setAgency("0001");
+        account.setAccountNumber(generateUniqueAccountNumber());
+        account.setAccountType(com.agiota.bank.model.account.AccountType.CORRENTE);
+        account.setBalance(BigDecimal.ZERO);
+        account.setStatus(AccountStatus.ATIVO);
+
+        Account savedAccount = accountRepository.save(account);
+        log.info("Default account created successfully: {}", savedAccount.getAccountNumber());
+
+        notificationService.notifyAccountCreated(user, savedAccount.getAccountNumber(), savedAccount.getAgency());
+
+        return accountMapper.toAccountResponse(savedAccount);
+    }
 }

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.agiota.bank.dto.request.UserRequestDTO;
 import com.agiota.bank.dto.response.UserResponseDTO;
@@ -11,6 +12,7 @@ import com.agiota.bank.exception.ResourceNotFoundException;
 import com.agiota.bank.mapper.UserMapper;
 import com.agiota.bank.model.user.User;
 import com.agiota.bank.repository.UserRepository;
+import com.agiota.bank.service.account.AccountService;
 import com.agiota.bank.service.notification.NotificationService;
 
 import lombok.AllArgsConstructor;
@@ -22,7 +24,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper mapper;
-        private final NotificationService notificationService;
+    private final NotificationService notificationService;
+    private final AccountService accountService;
 
 
     @Override
@@ -31,11 +34,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponseDTO create(UserRequestDTO postRequest) {
         User user = mapper.toUserPostRequest(postRequest);
-        userRepository.save(user);
-        notificationService.notifyUserCreated(user);
-        return mapper.toUserPostResponse(user);
+        User savedUser = userRepository.save(user);
+
+        // Criar conta automaticamente para o novo usuário
+        accountService.createDefaultAccountForUser(savedUser);
+
+        notificationService.notifyUserCreated(savedUser);
+        return mapper.toUserPostResponse(savedUser);
     }
 
     @Override
