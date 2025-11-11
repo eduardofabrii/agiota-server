@@ -9,6 +9,7 @@ import java.util.List;
 public interface PixKeyService {
     PixKeyResponseDTO createPixKey(PixKeyRequestDTO dto, Long accountId, User user);
     PixKeyResponseDTO getPixKey(String keyValue);
-    List<PixKeyResponseDTO> listPixKeyByAccountId(Long accountId); // Revertido
+    List<PixKeyResponseDTO> listPixKeyByAccountId(Long accountId);
+    List<PixKeyResponseDTO> listAllPixKeys();
     void deletePixKey(String keyValue, User user);
 }

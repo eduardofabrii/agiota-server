@@ -97,6 +97,21 @@ class PixKeyControllerTest {
     }
 
     @Test
+    void listAllPixKeys_shouldReturnAllKeys() {
+        // Arrange
+        List<PixKeyResponseDTO> keys = Collections.singletonList(responseDTO);
+        when(pixKeyService.listAllPixKeys()).thenReturn(keys);
+
+        // Act
+        ResponseEntity<List<PixKeyResponseDTO>> response = pixKeyController.listAllPixKeys();
+
+        // Assert
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(keys);
+        verify(pixKeyService).listAllPixKeys();
+    }
+
+    @Test
     void deletePixKey_shouldDeleteKey() {
         // Arrange
         doNothing().when(pixKeyService).deletePixKey(keyValue, mockUser);

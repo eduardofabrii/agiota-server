@@ -129,6 +129,20 @@ class PixKeyServiceTest {
     }
 
     @Test
+    void listAllPixKey(){
+        // Arrange
+        when(pixKeyRepository.findAll()).thenReturn(Collections.singletonList(pixKey));
+        when(mapper.toPixKeyListResponse(any())).thenReturn(Collections.singletonList(responseDTO));
+
+        // Act
+        List<PixKeyResponseDTO> result = pixKeyService.listAllPixKeys();
+
+        // Assert
+        assertThat(result).hasSize(1);
+        verify(pixKeyRepository).findAll();
+    }
+
+    @Test
     void deletePixKey_shouldDeleteKey_whenUserHasPermission() {
         // Arrange
         when(pixKeyRepository.findByKeyValue(keyValue)).thenReturn(Optional.of(pixKey));
