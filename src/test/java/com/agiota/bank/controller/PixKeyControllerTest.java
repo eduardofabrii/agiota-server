@@ -3,6 +3,7 @@ package com.agiota.bank.controller;
 import com.agiota.bank.dto.request.PixKeyRequestDTO;
 import com.agiota.bank.dto.response.PixKeyResponseDTO;
 import com.agiota.bank.model.pixkey.PixKeyTypes;
+import com.agiota.bank.model.user.User;
 import com.agiota.bank.service.pixkey.PixKeyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,7 @@ class PixKeyControllerTest {
     @InjectMocks
     private PixKeyController pixKeyController;
 
+    private User mockUser;
     private PixKeyRequestDTO requestDTO;
     private PixKeyResponseDTO responseDTO;
     private String keyValue = "test@test.com";
@@ -40,6 +42,9 @@ class PixKeyControllerTest {
 
     @BeforeEach
     void setUp() {
+        mockUser = new User();
+        mockUser.setId(1L);
+
         requestDTO = new PixKeyRequestDTO(keyValue, PixKeyTypes.EMAIL);
         responseDTO = new PixKeyResponseDTO(keyValue, PixKeyTypes.EMAIL.name(), accountId);
 
@@ -48,18 +53,18 @@ class PixKeyControllerTest {
     }
 
     @Test
-    void createPixKey_shouldCreateKey() {
+    void createPixKey_shouldCallServiceAndReturnCreated() {
         // Arrange
-        when(pixKeyService.createPixKey(any(PixKeyRequestDTO.class), eq(accountId))).thenReturn(responseDTO);
+        when(pixKeyService.createPixKey(any(PixKeyRequestDTO.class), eq(accountId), any(User.class))).thenReturn(responseDTO);
 
         // Act
-        ResponseEntity<PixKeyResponseDTO> response = pixKeyController.createPixKey(requestDTO, accountId);
+        ResponseEntity<PixKeyResponseDTO> response = pixKeyController.createPixKey(requestDTO, accountId, mockUser);
 
         // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isEqualTo(responseDTO);
         assertThat(response.getHeaders().getLocation().getPath()).endsWith("/" + keyValue);
-        verify(pixKeyService).createPixKey(eq(requestDTO), eq(accountId));
+        verify(pixKeyService).createPixKey(eq(requestDTO), eq(accountId), eq(mockUser));
     }
 
     @Test
@@ -94,13 +99,13 @@ class PixKeyControllerTest {
     @Test
     void deletePixKey_shouldDeleteKey() {
         // Arrange
-        doNothing().when(pixKeyService).deletePixKey(keyValue);
+        doNothing().when(pixKeyService).deletePixKey(keyValue, mockUser);
 
         // Act
-        ResponseEntity<Void> response = pixKeyController.deletePixKey(keyValue);
+        ResponseEntity<Void> response = pixKeyController.deletePixKey(keyValue, mockUser);
 
         // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        verify(pixKeyService).deletePixKey(keyValue);
+        verify(pixKeyService).deletePixKey(keyValue, mockUser);
     }
 }

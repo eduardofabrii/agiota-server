@@ -37,7 +37,7 @@ public class AgiotaBankApplication implements CommandLineRunner {
         List<Account> contas = getAccounts(user1, user2);
         accountRepository.saveAll(contas);
         PixKey pixKey1 = new PixKey("11111111111", PixKeyTypes.CPF ,contas.get(0));
-        PixKey pixKey2 = new PixKey("41 99999-9999", PixKeyTypes.TELEFONE, contas.get(1));
+        PixKey pixKey2 = new PixKey("41 99999-9999", PixKeyTypes.TELEFONE,contas.get(1));
         pixKeyRepository.saveAll(Arrays.asList(pixKey1, pixKey2));
     }
 

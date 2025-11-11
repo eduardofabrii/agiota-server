@@ -2,12 +2,14 @@ package com.agiota.bank.controller;
 
 import com.agiota.bank.dto.request.PixKeyRequestDTO;
 import com.agiota.bank.dto.response.PixKeyResponseDTO;
+import com.agiota.bank.model.user.User;
 import com.agiota.bank.service.pixkey.PixKeyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -25,8 +27,9 @@ public class PixKeyController {
     @Operation(summary = "Criar nova chave PIX")
     public ResponseEntity<PixKeyResponseDTO> createPixKey(
             @Valid @RequestBody PixKeyRequestDTO dto,
-            @PathVariable Long accountId) {
-        PixKeyResponseDTO response = pixKeyService.createPixKey(dto, accountId);
+            @PathVariable Long accountId,
+            @AuthenticationPrincipal User user) {
+        PixKeyResponseDTO response = pixKeyService.createPixKey(dto, accountId, user);
         
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{keyValue}")
@@ -52,10 +55,10 @@ public class PixKeyController {
 
     @DeleteMapping("/{keyValue}")
     @Operation(summary = "Excluir chave PIX")
-    public ResponseEntity<Void> deletePixKey(@PathVariable String keyValue) {
-        pixKeyService.deletePixKey(keyValue);
+    public ResponseEntity<Void> deletePixKey(
+            @PathVariable String keyValue,
+            @AuthenticationPrincipal User user) {
+        pixKeyService.deletePixKey(keyValue, user);
         return ResponseEntity.noContent().build();
     }
 }
-
-//fix pix
