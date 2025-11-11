@@ -1,12 +1,15 @@
 package com.agiota.bank.service.user;
 
 import com.agiota.bank.dto.request.UserRequestDTO;
+import com.agiota.bank.dto.response.AccountResponseDTO;
 import com.agiota.bank.dto.response.UserResponseDTO;
 import com.agiota.bank.exception.ResourceNotFoundException;
 import com.agiota.bank.model.user.User;
 import com.agiota.bank.model.user.UserRole;
 import com.agiota.bank.repository.UserRepository;
 import com.agiota.bank.mapper.UserMapper;
+import com.agiota.bank.service.account.AccountService;
+import com.agiota.bank.service.notification.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +38,12 @@ class UserServiceTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private AccountService accountService;
 
     private User mockUser;
     private UserRequestDTO mockUserRequest;
@@ -91,6 +100,7 @@ class UserServiceTest {
         when(userMapper.toUserPostRequest(mockUserRequest)).thenReturn(mockUser);
         when(userRepository.save(any(User.class))).thenReturn(mockUser);
         when(userMapper.toUserPostResponse(mockUser)).thenReturn(mockUserResponse);
+        when(accountService.createDefaultAccountForUser(any(User.class))).thenReturn(mock(AccountResponseDTO.class));
 
         // Act
         UserResponseDTO result = userService.create(mockUserRequest);
@@ -99,6 +109,8 @@ class UserServiceTest {
         assertThat(result).isEqualTo(mockUserResponse);
         verify(userMapper).toUserPostRequest(mockUserRequest);
         verify(userRepository).save(any(User.class));
+        verify(accountService).createDefaultAccountForUser(any(User.class));
+        verify(notificationService).notifyUserCreated(any(User.class));
         verify(userMapper).toUserPostResponse(mockUser);
     }
 

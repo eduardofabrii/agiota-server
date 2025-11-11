@@ -65,13 +65,13 @@ class TransactionServiceTest {
         originAccount.setUser(user);
         originAccount.setBalance(new BigDecimal("1000.00"));
         originAccount.setAgency("0001");
-        originAccount.setAccountNumber("12345-6");
+        originAccount.setAccountNumber("123456");
 
         destinationAccount = new Account();
         destinationAccount.setId(2L);
         destinationAccount.setBalance(new BigDecimal("500.00"));
         destinationAccount.setAgency("0002");
-        destinationAccount.setAccountNumber("78910-1");
+        destinationAccount.setAccountNumber("789101");
 
         transactionRequest = new TransactionRequestDTO(
                 originAccount.getId(),

@@ -38,13 +38,38 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler(CardException.class)
-    public ResponseEntity<ErrorResponse> handleCardException(CardException ex) {
-        log.error("Card error: {}", ex.getMessage());
+    @ExceptionHandler(AccountException.class)
+    public ResponseEntity<ErrorResponse> handleAccountException(AccountException ex) {
+        log.error("Account error: {} - {}", ex.getErrorCode().getCode(), ex.getMessage());
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                ex.getErrorCode().getCode(),
-                ex.getErrorCode().getMessage()
+                ex.getMessage(),
+                ex.getErrorCode().getMessage(),
+                ex.getErrorCode().getCode()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(CardException.class)
+    public ResponseEntity<ErrorResponse> handleCardException(CardException ex) {
+        log.error("Card error: {} - {}", ex.getErrorCode().getCode(), ex.getMessage());
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                ex.getErrorCode().getMessage(),
+                ex.getErrorCode().getCode()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(DeviceException.class)
+    public ResponseEntity<ErrorResponse> handleDeviceException(DeviceException ex) {
+        log.error("Device error: {} - {}", ex.getErrorCode().getCode(), ex.getMessage());
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                ex.getErrorCode().getMessage(),
+                ex.getErrorCode().getCode()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
@@ -54,8 +79,8 @@ public class GlobalExceptionHandler {
         log.error("Resource not found: {}", ex.getMessage());
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
-                ex.getMessage(),
-                "Recurso não encontrado"
+                "Recurso não encontrado",
+                ex.getMessage()
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
@@ -77,8 +102,8 @@ public class GlobalExceptionHandler {
         log.error("Resource already exists: {}", ex.getMessage());
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.CONFLICT.value(),
-                ex.getMessage(),
-                "Recurso já existe"
+                "Recurso já existe",
+                ex.getMessage()
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
@@ -88,8 +113,8 @@ public class GlobalExceptionHandler {
         log.error("Invalid bank data: {}", ex.getMessage());
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                ex.getMessage(),
-                "Dados bancários inválidos"
+                "Dados bancários inválidos",
+                ex.getMessage()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
@@ -99,8 +124,19 @@ public class GlobalExceptionHandler {
         log.error("Invalid argument: {}", ex.getMessage());
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                ex.getMessage(),
-                "Dados inválidos"
+                "Dados inválidos",
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException ex) {
+        log.error("Invalid state: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Operação inválida",
+                ex.getMessage()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
@@ -111,7 +147,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Erro interno do servidor",
-                ex.getMessage()
+                "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde."
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
