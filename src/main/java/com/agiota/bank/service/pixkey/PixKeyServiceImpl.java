@@ -75,6 +75,12 @@ public class PixKeyServiceImpl implements PixKeyService {
     }
 
     @Override
+    public List<PixKeyResponseDTO> listAllPixKeys() {
+        List<PixKey> pixKeys = pixKeyRepository.findAll();
+        return mapper.toPixKeyListResponse(pixKeys);
+    }
+
+    @Override
     public void deletePixKey(String keyValue, User user) {
         PixKey pixKey = pixKeyRepository.findByKeyValue(keyValue)
                 .orElseThrow(() -> new ResourceNotFoundException("Chave Pix não encontrada"));

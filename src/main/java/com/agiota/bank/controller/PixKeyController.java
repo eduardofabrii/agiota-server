@@ -53,6 +53,13 @@ public class PixKeyController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/all")
+    @Operation(summary = "Listar todas as chaves PIX")
+    public ResponseEntity<List<PixKeyResponseDTO>> listAllPixKeys() {
+        List<PixKeyResponseDTO> response = pixKeyService.listAllPixKeys();
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/{keyValue}")
     @Operation(summary = "Excluir chave PIX")
     public ResponseEntity<Void> deletePixKey(
