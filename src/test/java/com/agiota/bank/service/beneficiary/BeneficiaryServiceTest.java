@@ -1,14 +1,17 @@
 package com.agiota.bank.service.beneficiary;
 
 import com.agiota.bank.dto.request.BeneficiaryRequestDTO;
+import com.agiota.bank.dto.request.BeneficiaryUpdateRequestDTO;
 import com.agiota.bank.dto.response.BeneficiaryResponseDTO;
 import com.agiota.bank.exception.ResourceNotFoundException;
 import com.agiota.bank.mapper.BeneficiaryMapper;
 import com.agiota.bank.model.account.Account;
 import com.agiota.bank.model.account.AccountType;
 import com.agiota.bank.model.beneficiary.Beneficiary;
+import com.agiota.bank.model.user.User;
 import com.agiota.bank.repository.AccountRepository;
 import com.agiota.bank.repository.BeneficiaryRepository;
+import com.agiota.bank.service.notification.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,16 +44,26 @@ class BeneficiaryServiceTest {
     @Mock
     private BeneficiaryMapper beneficiaryMapper;
 
+    @Mock
+    private NotificationService notificationService;
+
     private Beneficiary mockBeneficiary;
     private Account mockOwnerAccount;
+    private User mockUser;
     private BeneficiaryRequestDTO mockBeneficiaryRequest;
+    private BeneficiaryUpdateRequestDTO mockBeneficiaryUpdateRequest;
     private BeneficiaryResponseDTO mockBeneficiaryResponse;
     private Long ownerAccountId = 1L;
 
     @BeforeEach
     void setUp() {
+        mockUser = new User();
+        mockUser.setId(1L);
+        mockUser.setName("Test User");
+        
         mockOwnerAccount = new Account();
         mockOwnerAccount.setId(ownerAccountId);
+        mockOwnerAccount.setUser(mockUser);
 
         mockBeneficiary = new Beneficiary();
         mockBeneficiary.setId(1L);
@@ -65,6 +78,15 @@ class BeneficiaryServiceTest {
         mockBeneficiary.setUpdatedAt(LocalDateTime.now());
 
         mockBeneficiaryRequest = new BeneficiaryRequestDTO(
+                "João Silva",
+                "12345678901",
+                "001",
+                "1234",
+                "123456789",  // Número com 9 dígitos
+                AccountType.CORRENTE
+        );
+
+        mockBeneficiaryUpdateRequest = new BeneficiaryUpdateRequestDTO(
                 "João Silva",
                 "12345678901",
                 "001",
@@ -165,7 +187,7 @@ class BeneficiaryServiceTest {
         when(beneficiaryMapper.toBeneficiaryResponse(mockBeneficiary)).thenReturn(mockBeneficiaryResponse);
 
         // Act
-        BeneficiaryResponseDTO result = beneficiaryService.update(1L, ownerAccountId, mockBeneficiaryRequest);
+        BeneficiaryResponseDTO result = beneficiaryService.update(1L, ownerAccountId, mockBeneficiaryUpdateRequest);
 
         // Assert
         assertThat(result).isEqualTo(mockBeneficiaryResponse);
@@ -182,7 +204,7 @@ class BeneficiaryServiceTest {
         when(beneficiaryRepository.findById(1L)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> beneficiaryService.update(1L, ownerAccountId, mockBeneficiaryRequest))
+        assertThatThrownBy(() -> beneficiaryService.update(1L, ownerAccountId, mockBeneficiaryUpdateRequest))
                 .isInstanceOf(ResourceNotFoundException.class);
         
         verify(accountRepository).findById(ownerAccountId);

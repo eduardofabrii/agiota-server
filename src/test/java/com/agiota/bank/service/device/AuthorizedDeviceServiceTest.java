@@ -2,7 +2,7 @@ package com.agiota.bank.service.device;
 
 import com.agiota.bank.dto.request.AuthorizedDeviceRequestDTO;
 import com.agiota.bank.dto.response.AuthorizedDeviceResponseDTO;
-import com.agiota.bank.exception.ResourceNotFoundException;
+import com.agiota.bank.exception.DeviceException;
 import com.agiota.bank.mapper.AuthorizedDeviceMapper;
 import com.agiota.bank.model.device.AuthorizedDevice;
 import com.agiota.bank.model.device.DeviceType;
@@ -105,8 +105,8 @@ class AuthorizedDeviceServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> deviceService.authorizeDevice(mockRequestDTO))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("User not found");
+                .isInstanceOf(DeviceException.class)
+                .hasMessageContaining("Usuário não encontrado");
 
         verify(userRepository).findById(userId);
         verify(deviceRepository, never()).save(any());
@@ -136,8 +136,8 @@ class AuthorizedDeviceServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> deviceService.getDevicesByUserId(userId))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("User not found");
+                .isInstanceOf(DeviceException.class)
+                .hasMessageContaining("Usuário não encontrado");
 
         verify(userRepository).existsById(userId);
         verify(deviceRepository, never()).findByUserId(any());
@@ -164,8 +164,8 @@ class AuthorizedDeviceServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> deviceService.getDeviceById(deviceId))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Device not found");
+                .isInstanceOf(DeviceException.class)
+                .hasMessageContaining("Dispositivo não encontrado");
 
         verify(deviceRepository).findById(deviceId);
     }
@@ -191,8 +191,8 @@ class AuthorizedDeviceServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> deviceService.revokeDevice(deviceId))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Device not found");
+                .isInstanceOf(DeviceException.class)
+                .hasMessageContaining("Dispositivo não encontrado");
 
         verify(deviceRepository).findById(deviceId);
         verify(deviceRepository, never()).save(any());

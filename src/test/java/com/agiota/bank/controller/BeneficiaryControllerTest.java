@@ -1,6 +1,7 @@
 package com.agiota.bank.controller;
 
 import com.agiota.bank.dto.request.BeneficiaryRequestDTO;
+import com.agiota.bank.dto.request.BeneficiaryUpdateRequestDTO;
 import com.agiota.bank.dto.response.BeneficiaryResponseDTO;
 import com.agiota.bank.model.account.AccountType;
 import com.agiota.bank.service.beneficiary.BeneficiaryService;
@@ -32,6 +33,7 @@ class BeneficiaryControllerTest {
     private BeneficiaryController beneficiaryController;
 
     private BeneficiaryRequestDTO requestDTO;
+    private BeneficiaryUpdateRequestDTO updateRequestDTO;
     private BeneficiaryResponseDTO responseDTO;
     private Long ownerAccountId;
 
@@ -39,6 +41,9 @@ class BeneficiaryControllerTest {
     void setUp() {
         ownerAccountId = 100L;
         requestDTO = new BeneficiaryRequestDTO(
+                "João Silva", "12345678901", "001", "1234", "123456789", AccountType.CORRENTE
+        );
+        updateRequestDTO = new BeneficiaryUpdateRequestDTO(
                 "João Silva", "12345678901", "001", "1234", "123456789", AccountType.CORRENTE
         );
         responseDTO = new BeneficiaryResponseDTO(
@@ -81,15 +86,15 @@ class BeneficiaryControllerTest {
     void update_shouldUpdateBeneficiary() {
         // Given
         Long beneficiaryId = 1L;
-        when(beneficiaryService.update(eq(beneficiaryId), eq(ownerAccountId), any(BeneficiaryRequestDTO.class))).thenReturn(responseDTO);
+        when(beneficiaryService.update(eq(beneficiaryId), eq(ownerAccountId), any(BeneficiaryUpdateRequestDTO.class))).thenReturn(responseDTO);
 
         // When
-        ResponseEntity<BeneficiaryResponseDTO> response = beneficiaryController.update(beneficiaryId, ownerAccountId, requestDTO);
+        ResponseEntity<BeneficiaryResponseDTO> response = beneficiaryController.update(beneficiaryId, ownerAccountId, updateRequestDTO);
 
         // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(responseDTO, response.getBody());
-        verify(beneficiaryService).update(beneficiaryId, ownerAccountId, requestDTO);
+        verify(beneficiaryService).update(beneficiaryId, ownerAccountId, updateRequestDTO);
     }
 
     @Test

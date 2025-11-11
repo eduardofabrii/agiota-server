@@ -2,7 +2,7 @@ package com.agiota.bank.service.cards;
 
 import com.agiota.bank.dto.request.CardRequestDTO;
 import com.agiota.bank.dto.response.CardResponseDTO;
-import com.agiota.bank.exception.ResourceNotFoundException;
+import com.agiota.bank.exception.CardException;
 import com.agiota.bank.mapper.CardMapper;
 import com.agiota.bank.model.account.Account;
 import com.agiota.bank.model.cards.Card;
@@ -108,8 +108,8 @@ class CardServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> cardService.getById(cardId))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Card not found");
+                .isInstanceOf(CardException.class)
+                .hasMessageContaining("Cartão não encontrado");
 
         verify(cardRepository).findById(cardId);
     }
@@ -154,8 +154,8 @@ class CardServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> cardService.update(cardId, mockCardRequest))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Card not found");
+                .isInstanceOf(CardException.class)
+                .hasMessageContaining("Cartão não encontrado");
 
         verify(cardRepository).findById(cardId);
         verify(cardRepository, never()).save(any());
@@ -164,12 +164,14 @@ class CardServiceTest {
     @Test
     void delete_shouldDeleteCard() {
         // Arrange
+        when(cardRepository.existsById(cardId)).thenReturn(true);
         doNothing().when(cardRepository).deleteById(cardId);
 
         // Act
         cardService.delete(cardId);
 
         // Assert
+        verify(cardRepository).existsById(cardId);
         verify(cardRepository).deleteById(cardId);
     }
 }
