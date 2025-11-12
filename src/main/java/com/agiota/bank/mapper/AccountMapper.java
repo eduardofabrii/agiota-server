@@ -16,10 +16,10 @@ public interface AccountMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "agency", ignore = true)
     @Mapping(target = "accountNumber", ignore = true)
-    @Mapping(target = "balance", ignore = true)
-    @Mapping(target = "status", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "transactions", ignore = true)
+    @Mapping(target = "transactionsReceived", ignore = true)
     Account toAccount(AccountRequestDTO requestDTO);
 
     AccountResponseDTO toAccountResponse(Account account);
