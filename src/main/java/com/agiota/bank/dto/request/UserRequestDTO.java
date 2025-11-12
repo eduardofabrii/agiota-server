@@ -8,5 +8,5 @@ import jakarta.validation.constraints.NotBlank;
 public record UserRequestDTO(String name,
                              String password,
                              @Email String email,
-                             @NotBlank UserRole role) {
+                            @NotBlank UserRole role) {
 }
