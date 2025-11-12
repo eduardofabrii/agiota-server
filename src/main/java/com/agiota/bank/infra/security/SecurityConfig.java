@@ -2,6 +2,7 @@ package com.agiota.bank.infra.security;
 
 import com.agiota.bank.exception.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final SecurityFilter securityFilter;
+    private final ObjectMapper objectMapper = createObjectMapper();
+
+    private ObjectMapper createObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        return mapper;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -78,8 +86,8 @@ public class SecurityConfig {
         return (request, response, accessDeniedException) -> {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType("application/json");
-            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Acesso Negado", "Você não tem permissão para acessar este recurso.");
-            response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Acesso Negado", "Voce nao tem permissao para acessar este recurso.");
+            response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
         };
     }
 
@@ -87,8 +95,8 @@ public class SecurityConfig {
         return (request, response, authException) -> {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
-            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Não Autorizado", "Token de autenticação inválido ou expirado.");
-            response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Nao Autorizado", "Token de autenticacao invalido ou expirado.");
+            response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
         };
     }
 
