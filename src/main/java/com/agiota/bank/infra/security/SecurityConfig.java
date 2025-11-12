@@ -66,7 +66,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/v1/loans/{id}/approval").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/v1/support-tickets").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/v1/notifications/**").hasRole("USER") 
-                        .requestMatchers(HttpMethod.DELETE, "/v1/notifications/**").hasRole("USER") 
                         .requestMatchers(HttpMethod.POST, "/v1/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/v1/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/v1/**").hasRole("ADMIN")
