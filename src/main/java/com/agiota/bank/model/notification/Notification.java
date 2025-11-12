@@ -25,7 +25,7 @@ public class Notification {
     @JoinColumn(name = "user_id", nullable = false)
     private User recipient; 
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String message;
 
     @Enumerated(EnumType.STRING)

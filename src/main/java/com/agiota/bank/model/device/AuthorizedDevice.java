@@ -32,7 +32,7 @@ public class AuthorizedDevice {
     @Column(nullable = false)
     private LocalDateTime lastLoginDate;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "BOOLEAN")
     private boolean authorized = true;
 
     @ManyToOne(fetch = FetchType.LAZY)

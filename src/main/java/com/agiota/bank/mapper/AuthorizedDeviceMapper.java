@@ -21,7 +21,10 @@ public interface AuthorizedDeviceMapper {
     })
     AuthorizedDevice toEntity(AuthorizedDeviceRequestDTO dto, User user);
 
-    @Mapping(target = "userId", source = "user.id")
+    @Mappings({
+        @Mapping(target = "userId", source = "user.id"),
+        @Mapping(target = "isAuthorized", source = "authorized")
+    })
     AuthorizedDeviceResponseDTO toResponse(AuthorizedDevice entity);
 
     List<AuthorizedDeviceResponseDTO> toResponseList(List<AuthorizedDevice> entities);
